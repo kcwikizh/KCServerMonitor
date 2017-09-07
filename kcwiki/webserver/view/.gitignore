@@ -4,6 +4,7 @@
 #*.sln  
 #.config  
 admin.java
+login.java
 
   
 #过滤文件夹Debug,Release,obj  
