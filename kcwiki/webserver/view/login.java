@@ -54,9 +54,6 @@ public class login extends HttpServlet{
     
     HashMap<String, Object> data = new  HashMap<>();
     HttpSession session = request.getSession(true); 
-    //激活用账号
-        getUserList().put("kcwikiserver2016", "895987");
-        //getUserList().put("456", "shutdown");
     
     if( getUserList().containsKey(username)){
         if( getUserList().get(username).equals(password)){
