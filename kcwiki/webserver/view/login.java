@@ -35,6 +35,7 @@ public class login extends HttpServlet{
     public static HashMap<String, Object> getUserList() {
         return userList;
     }
+    
     private static HashMap<String, Object> userList;
     private static boolean isActivative = false;
     
@@ -42,11 +43,14 @@ public class login extends HttpServlet{
   {
     response.setContentType("text/xml");
     response.setContentType("text/html;charset=UTF-8;pageEncoding=UTF-8"); 
-    userList = moe.kcwiki.webserver.util.userList.getUserList();
-    if(!isActivative){
-        isActivative=true;
-        new MainServer().init(); 
+    
+    if(!MainServer.isInit()){
+        MainServer.init(); 
         Controller.ininPool();
+    }
+    if(!isActivative){
+        userList = moe.kcwiki.webserver.util.userList.getUserList();
+        isActivative = true ;
     }
     
     String username=request.getParameter("username");

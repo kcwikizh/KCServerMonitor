@@ -115,7 +115,7 @@ public class MainServer {
     private static String slotitemno;
     private static String KcUser;
     private static String KcPassword;
-    private static boolean DebugMode;
+    private static boolean DebugMode = false;
     private static boolean stopScanner = false;
     private static boolean init = false;
     private static String webrootPath;
@@ -127,7 +127,7 @@ public class MainServer {
     
     public static HashMap<String, String> FileList = new HashMap<>();  
     
-    public boolean init(){
+    public static boolean init(){
         if(init){return false;}
         try {
             //String path = Thread.currentThread().getContextClassLoader().getResource("/").getPath();
@@ -158,7 +158,7 @@ public class MainServer {
     }
     
     @SuppressWarnings("empty-statement")
-    public void readini() {  
+    public static void readini() {  
         IniFile iniFile=new BasicIniFile();  
         File file=new File(MainServer.getDataPath()+File.separator+"Preset.ini");  
         IniFileReader rad=new IniFileReader(iniFile,file);  
