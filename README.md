@@ -1,10 +1,10 @@
 # KCServerMonitor
 </br></br>
-Packetcapture Tools for the <font color="#1E90FF"><b>C2 servers</b></font> after the maintenance.
+Tools for the <font color="#1E90FF"><b>C2 servers</b></font> after/under the maintenance.
 </br>用于C2服务器维护后的抓包工具。
 </br>
 
-Some configuration files not uploaded.Needs to write a copy yourself.
+Some configuration files were not uploaded.Needs to write it yourself.
 </br>部分配置文件没有上传。需要自行写一份。
 </br>
 
