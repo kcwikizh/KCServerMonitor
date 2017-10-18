@@ -87,7 +87,7 @@ public class GetUnkownShip {
     public boolean loadKnewFile(){
         String line;
         String str = "";
-        String ipFile=MainServer.getDataPath()+File.separator+"allshipMd5.json";
+        String ipFile=MainServer.getDataPath()+File.separator+"shipgraphdata.json";
         if(!new File(ipFile).exists()){
             msgPublish.msgPublisher("找不到Md5的扫描文件，请向技术组索取。",0,-1);
             return false;
@@ -142,7 +142,7 @@ public class GetUnkownShip {
                 Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
-            file.renameTo(new File(unknowShipFile+" backup.txt"));
+            //file.renameTo(new File(unknowShipFile+" backup.txt"));
         }
         
         try (BufferedReader nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(intputFile), Encoder.codeString(intputFile)))) {

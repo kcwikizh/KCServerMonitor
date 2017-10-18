@@ -27,10 +27,12 @@ public class MakeNewSlotitemData {
     public boolean WriteFile() throws FileNotFoundException, UnsupportedEncodingException, IOException{
         if(DBCenter.NewSlotitemDB.isEmpty()){return false;}
         
-        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+File.separator+"lua_weapon.json")), "UTF-8"))) {
+        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksPath()+File.separator+"lua_weapon.json")), "UTF-8"))) {
             Set<String> keys = DBCenter.NewSlotitemDB.keySet();
+            int count = 0;
             for (String key : keys){
-                if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id())>=500){continue;}
+                count++;
+                if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id()) >= 500){continue;}
                 String id;
                 if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id())<10){
                     id="00"+DBCenter.NewSlotitemDB.get(key).getApi_id();
@@ -38,6 +40,9 @@ public class MakeNewSlotitemData {
                     id="0"+DBCenter.NewSlotitemDB.get(key).getApi_id();
                 }else{
                     id=DBCenter.NewSlotitemDB.get(key).getApi_id();
+                }
+                if(count == 1) {
+                    eBfw.write("\t,"+constant.LINESEPARATOR);
                 }
                 eBfw.write("\t[\""+id+"\"] = {"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"日文名\"] = \""+DBCenter.NewSlotitemDB.get(key).getApi_name()+"\","+constant.LINESEPARATOR);
@@ -48,7 +53,7 @@ public class MakeNewSlotitemData {
                     rare=rare+"☆";
                 }
                 eBfw.write("\t\t[\"稀有度\"] = \""+rare+"\","+constant.LINESEPARATOR);
-                eBfw.write("\t\t[\"状态\"] = {[\"开发\"] = -10086,[\"改修\"] = -10086,[\"更新\"] = -10086,[\"熟练\"] = -10086},"+constant.LINESEPARATOR);
+                eBfw.write("\t\t[\"状态\"] = {[\"开发\"] = 0,[\"改修\"] = 0,[\"更新\"] = 0,[\"熟练\"] = 0},"+constant.LINESEPARATOR);
                 String state="";
                 if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_taik())>0){
                     state=state+"[\"耐久\"] = "+DBCenter.NewSlotitemDB.get(key).getApi_taik()+",";
@@ -113,7 +118,11 @@ public class MakeNewSlotitemData {
                 eBfw.write("\t\t[\"废弃\"] = {[\"燃料\"] = "+broken[0].substring(1, broken[0].length())+",[\"弹药\"] = "+broken[1]+",[\"钢材\"] = "+broken[2]+",[\"铝\"] = "+broken[3].substring(0, broken[0].length()-1)+"},"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"装备适用\"] = {},"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"备注\"] = \"\""+constant.LINESEPARATOR);
-                eBfw.write("\t},"+constant.LINESEPARATOR);     
+                if(count == keys.size()){
+                    eBfw.write("\t}"+constant.LINESEPARATOR);  
+                }else{
+                    eBfw.write("\t},"+constant.LINESEPARATOR);  
+                }
             }
         }
         msgPublish.msgPublisher("装备lua文件创建完毕", 0,0);

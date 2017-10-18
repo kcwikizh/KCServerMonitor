@@ -31,17 +31,22 @@ public class MakeNewShipData {
     public boolean WriteFile() throws FileNotFoundException, UnsupportedEncodingException, IOException{
         Set<String> keys = DBCenter.NewShipDB.keySet();
         for (String key : keys){
-            if(Integer.parseInt(key)>500){continue;}
+            if(Integer.parseInt(key) >= 1500){continue;}
             ShipList.put(DBCenter.NewShipDB.get(key).getApi_id(), DBCenter.NewShipDB.get(key));
         }
         if(ShipList.isEmpty()){return false;}
                 
-        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+File.separator+"lua_ship.json")), "UTF-8"))) {
+        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksPath()+File.separator+"lua_ship.json")), "UTF-8"))) {
             
             Set<String> listkeys = ShipList.keySet();
+            int count = 0;
             for (String key : listkeys){
-                if(Integer.parseInt(key)>500){continue;}
+                count++;
+                if(Integer.parseInt(key) >= 1500){continue;}
                 String[] str;
+                if(count == 1) {
+                    eBfw.write("\t,"+constant.LINESEPARATOR);
+                }
                 eBfw.write("\t[\"\"] = {"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"ID\"] = "+DBCenter.NewShipDB.get(key).getApi_id()+","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"图鉴号\"] = "+DBCenter.NewShipDB.get(key).getApi_sortno()+","+constant.LINESEPARATOR);
@@ -85,7 +90,11 @@ public class MakeNewShipData {
                 eBfw.write("\t\t[\"改造\"] = {[\"等级\"] = "+DBCenter.NewShipDB.get(key).getApi_afterlv()+",[\"弹药\"] = "+DBCenter.NewShipDB.get(key).getApi_afterbull()+",[\"钢材\"] = "+DBCenter.NewShipDB.get(key).getApi_afterfuel()+",[\"改装前\"] = \"\""+",[\"改装后\"] = \"\""+"},"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"画师\"] = \"-10086\""+","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"声优\"] = \"-10086\""+constant.LINESEPARATOR);
-                eBfw.write("\t},"+constant.LINESEPARATOR);
+                if(count == keys.size()){
+                    eBfw.write("\t}"+constant.LINESEPARATOR);  
+                }else{
+                    eBfw.write("\t},"+constant.LINESEPARATOR);  
+                }
             } 
         }
         msgPublish.msgPublisher("舰娘lua文件创建完毕",0, 0);

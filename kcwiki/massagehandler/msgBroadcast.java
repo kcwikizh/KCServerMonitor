@@ -5,7 +5,8 @@
  */
 package moe.kcwiki.massagehandler;
 
-import moe.kcwiki.webserver.websocket.*;
+import moe.kcwiki.webserver.websocket.guestWS;
+import moe.kcwiki.webserver.websocket.adminWS;
 
 
 /**

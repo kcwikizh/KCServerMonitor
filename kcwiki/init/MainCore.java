@@ -6,6 +6,7 @@
 package moe.kcwiki.init;
 
 import java.io.File;
+import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.util.Date;
 import java.util.logging.Level;
@@ -15,6 +16,7 @@ import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.constant;
 import javax.servlet.ServletException;  
 import javax.servlet.http.HttpServlet; 
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -29,8 +31,18 @@ public class MainCore {
     */
     
     public void cleanup(){
-        if(new File(MainServer.getTempFolder()).exists()){FileExerciser.delFolder(MainServer.getTempFolder());}
-        if(new File(MainServer.getDownloadFolder()).exists()){FileExerciser.delFolder(MainServer.getDownloadFolder());}
+        if(new File(MainServer.getTempFolder()).exists()){try {
+            FileUtils.deleteDirectory(new File(MainServer.getTempFolder()));
+            } catch (IOException ex) {
+                Logger.getLogger(MainCore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+}
+        if(new File(MainServer.getDownloadFolder()).exists()){try {
+            FileUtils.deleteDirectory(new File(MainServer.getDownloadFolder()));
+            } catch (IOException ex) {
+                Logger.getLogger(MainCore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+}
         new File(MainServer.getTempFolder()).mkdirs();
         new File(MainServer.getDownloadFolder()).mkdirs();
     }

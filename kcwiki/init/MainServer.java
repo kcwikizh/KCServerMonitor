@@ -17,85 +17,25 @@ import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import org.dtools.ini.*; 
 import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
 import javax.servlet.ServletException;  
 import javax.servlet.http.HttpServlet; 
+import moe.kcwiki.threadpool.Controller;
 import moe.kcwiki.tools.CatchError;
+import static moe.kcwiki.webserver.view.login.setUserList;
 
 /**
  *
  * @author user12
  */
+
+//http://www.cnblogs.com/younggun/archive/2013/12/12/3470821.html
 public class MainServer {
-
-    /**
-     * @return the privatePath
-     */
-    public static String getPrivatePath() {
-        return privatePath;
-    }
-
-    /**
-     * @return the tempPath
-     */
-    public static String getTempPath() {
-        return tempPath;
-    }
-
-    /**
-     * @return the publishPath
-     */
-    public static String getPublishPath() {
-        return publishPath;
-    }
-    
-    
-    public MainServer(){}
-    
-    /**
-     * @return the proxyhost
-     */
-    public static String getProxyhost() {
-        return proxyhost;
-    }
-
-    /**
-     * @return the KcUser
-     */
-    public static String getKcUser() {
-        return KcUser;
-    }
-
-    /**
-     * @return the KcPassword
-     */
-    public static String getKcPassword() {
-        return KcPassword;
-    }
-
-    /**
-     * @return the proxyport
-     */
-    public static int getProxyport() {
-        return proxyport;
-    }
-
-    /**
-     * @return the slotitemno
-     */
-    public static String getSlotitemno() {
-        return slotitemno;
-    }
-
-    /**
-     * @param aSlotitemno the slotitemno to set
-     */
-    public static void setSlotitemno(String aSlotitemno) {
-        slotitemno = aSlotitemno;
-    }
 
     private static String localpath;
     private static String ffdecFolder;
@@ -103,6 +43,7 @@ public class MainServer {
     private static String downloadFolder;
     private static String proxyhost;
     private static int proxyport;  
+    private static boolean useproxy; 
     private static String kcwikiServerAddress;  
     private static String dmmServerAddress;  
     private static String dmmnetgamecookie; 
@@ -124,11 +65,13 @@ public class MainServer {
     private static String publishPath;
     private static String tempPath;
     private static String privatePath;
+    private static String worksPath;
     
     public static HashMap<String, String> FileList = new HashMap<>();  
     
-    public static boolean init(){
-        if(init){return false;}
+    
+    public static boolean init(boolean reinit){
+        if(init || !reinit){return false;}
         try {
             //String path = Thread.currentThread().getContextClassLoader().getResource("/").getPath();
             String classPath = MainServer.class.getResource("/").toString();
@@ -140,8 +83,8 @@ public class MainServer {
             MainServer.logPath = webrootPath + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom" + FILESEPARATOR + "log";
             MainServer.publishPath = MainServer.webrootPath + FILESEPARATOR + "Publishing";
             MainServer.privatePath = webrootPath + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom" ;
+            MainServer.worksPath = MainServer.webrootPath + FILESEPARATOR + "works";
             
-            new CatchError().init();
             readini();
             //readseason();
             init = true;
@@ -191,7 +134,8 @@ public class MainServer {
             if(!(new File(tempFolder).exists()&&new File(tempFolder).isDirectory())){new File(getTempFolder()).mkdirs();}
             if(!(new File(downloadFolder).exists()&&new File(downloadFolder).isDirectory())){new File(getDownloadFolder()).mkdirs();}
             if(!(new File(logPath).exists()&&new File(logPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
-            if(!(new File(publishPath).exists()&&new File(publishPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
+            if(!(new File(publishPath).exists() || new File(publishPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
+            if(!(new File(worksPath).exists() || new File(worksPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
             
             /*
             iniSection = iniFile.getSection("Lua");
@@ -205,6 +149,7 @@ public class MainServer {
             MainServer.KcPassword = iniSection.getItem("password").getValue(); 
             
             iniSection = iniFile.getSection("Proxy");
+            MainServer.useproxy = iniSection.getItem("enable").getValue().equals("1"); 
             MainServer.proxyport = Integer.parseInt(iniSection.getItem("port").getValue()); 
             MainServer.proxyhost = iniSection.getItem("host").getValue(); 
             
@@ -231,6 +176,7 @@ public class MainServer {
             for(IniItem item:iniSection){
                 moe.kcwiki.webserver.util.userList.userList.put(item.getName(), item.getValue());
             }
+            setUserList(moe.kcwiki.webserver.util.userList.getUserList());
             
             if(!(new File(tempFolder).exists()&&new File(tempFolder).isDirectory())){new File(getTempFolder()).mkdirs();}
             if(!(new File(downloadFolder).exists()&&new File(downloadFolder).isDirectory())){new File(getDownloadFolder()).mkdirs();}
@@ -428,4 +374,77 @@ public class MainServer {
     }
 
     
+    /**
+     * @return the privatePath
+     */
+    public static String getPrivatePath() {
+        return privatePath;
+    }
+
+    /**
+     * @return the tempPath
+     */
+    public static String getTempPath() {
+        return tempPath;
+    }
+
+    /**
+     * @return the publishPath
+     */
+    public static String getPublishPath() {
+        return publishPath;
+    }
+    
+    
+    public MainServer(){}
+    
+    /**
+     * @return the proxyhost
+     */
+    public static String getProxyhost() {
+        return proxyhost;
+    }
+
+    /**
+     * @return the KcUser
+     */
+    public static String getKcUser() {
+        return KcUser;
+    }
+
+    /**
+     * @return the KcPassword
+     */
+    public static String getKcPassword() {
+        return KcPassword;
+    }
+
+    /**
+     * @return the proxyport
+     */
+    public static int getProxyport() {
+        return proxyport;
+    }
+
+    /**
+     * @return the slotitemno
+     */
+    public static String getSlotitemno() {
+        return slotitemno;
+    }
+
+    /**
+     * @param aSlotitemno the slotitemno to set
+     */
+    public static void setSlotitemno(String aSlotitemno) {
+        slotitemno = aSlotitemno;
+    }
+
+    /**
+     * @return the worksPath
+     */
+    public static String getWorksPath() {
+        return worksPath;
+    }
+
 }

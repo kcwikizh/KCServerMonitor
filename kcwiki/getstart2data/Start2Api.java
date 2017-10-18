@@ -74,7 +74,7 @@ public class Start2Api {
                 conn = (HttpURLConnection) url.openConnection();  
                 conn.setDoOutput(true); 
                 conn.setRequestMethod("GET");  
-                conn.setRequestProperty("Host", "api.kcwiki.moe");  
+                conn.setRequestProperty("Host", "acc.kcwiki.org");  
                 conn.setRequestProperty("connection", "keep-alive");  
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
                 conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  

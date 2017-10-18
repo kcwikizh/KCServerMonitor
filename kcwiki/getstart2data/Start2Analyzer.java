@@ -53,7 +53,7 @@ public class Start2Analyzer {
         String startdata;
         if(buffer == null){
             startdata=new Start2Api().GetStart2Api(MainServer.getNewstart2());
-            //startdata=new Start2Api().GetStart2Api("http://api.kcwiki.moe/start2"); 
+            //startdata=new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2"); 
         }else{
             startdata=buffer.toString();
             if(startdata.contains("svdata")){
@@ -434,7 +434,7 @@ public class Start2Analyzer {
         StringBuilder buffer;
         String startdata;
         if(MainServer.isDebugMode()){
-            //startdata = new Start2Api().GetStart2Api("http://api.kcwiki.moe/start2/prev");
+            //startdata = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/prev");
             startdata=new Start2Api().GetStart2Api(MainServer.getOldstart2());
         }else{
             try (BufferedReader nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(moe.kcwiki.init.MainServer.getLocaloldstart2data()), Encoder.codeString(moe.kcwiki.init.MainServer.getLocaloldstart2data())))) {
@@ -988,7 +988,7 @@ public class Start2Analyzer {
     
     public boolean Export() throws FileNotFoundException, UnsupportedEncodingException, IOException{
     
-        String folder=localpath+File.separator+"temp"+File.separator+"Start2_Export.txt";
+        String folder=MainServer.getWorksPath()+File.separator+"Start2_Export.txt";
         wfFlag=false;
         String Data,nData;
         
@@ -1306,7 +1306,6 @@ public class Start2Analyzer {
         
         if(wfFlag){
             msgPublish.msgPublisher("Start2内发现新文件,即将开始下载。",0,0);
-            //Runtime.getRuntime().exec("cmd.exe /c start \"\" \""+folder+"\" &&exit");
         }else{
             msgPublish.msgPublisher("Start2内没有发现任何新文件。",0,0);
         }

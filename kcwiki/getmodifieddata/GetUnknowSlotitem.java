@@ -10,11 +10,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -22,6 +24,7 @@ import static java.lang.Thread.sleep;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.Iterator;
@@ -97,7 +100,7 @@ public class GetUnknowSlotitem {
                         }else{
                             serverAddress();
                              //msgPublish.msgPublisher("slotitemNo: "+slotitemNo,0,1);
-                            if(no != Integer.valueOf(slotitemNo)&& no > 300){
+                            if(no != Integer.valueOf(slotitemNo)&& no > 350){
                                 msgPublish.msgPublisher("扫描到新装备，已下载完毕",0,1);
                                 msgPublish.urlListPublisher(localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"card","newSlotitem");
                                 return taskID;
@@ -147,7 +150,7 @@ public class GetUnknowSlotitem {
         HttpURLConnection urlcon;
         System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
         System.setProperty("sun.net.client.defaultReadTimeout", "15000");
-        if(!(proxyhost.equals(""))){
+        if(!MainServer.isDebugMode()){
             Proxy tempproxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxyhost, proxyport));
             //Proxy tempproxy = new Proxy(Proxy.Type.SOCKS,new InetSocketAddress(proxyhost, proxyport));
             urlcon = (HttpURLConnection) serverUrl.openConnection(tempproxy);
@@ -205,7 +208,44 @@ public class GetUnknowSlotitem {
     }
     
     public static void main(String[] args){
-        new GetUnknowSlotitem().getUnknowData();
+        //new GetUnknowSlotitem().getUnknowData();
+        try {
+            //new GetUnknowSlotitem().getUnknowData();
+            HttpURLConnection connection = (HttpURLConnection) new URL("http://fp.ip-api.com/json").openConnection();
+            connection.setRequestProperty("Host", "fp.ip-api.com");
+            connection.setRequestProperty("Origin", "http://ip-api.com");
+            connection.setRequestProperty("Referer", "http://ip-api.com/");
+            connection.setRequestProperty("Connection", "keep-alive");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+            connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            connection.setRequestProperty("DNT", "1");
+            connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+            // 建立实际的连接
+            connection.setRequestMethod("GET");
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                InputStream is = connection.getInputStream();
+                byte[] by = new byte[1024];
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                // 将内容读取内存中
+                int len = -1;
+                while ((len = is.read(by)) != -1) {
+                    bos.write(by, 0, len);
+                }
+                // 关闭流
+                is.close();
+                JSONObject jobj = JSON.parseObject(bos.toString("utf-8"));
+                jobj.get("query");
+            }
+        } catch (ProtocolException ex) {
+            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

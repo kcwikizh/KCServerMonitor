@@ -36,7 +36,7 @@ public class Start2List {
     public static String[] getStart2List() throws InterruptedException, IOException, Exception {  
         HttpURLConnection conn1;  
         InputStream in;  
-        urlStr="http://api.kcwiki.moe/start2/archives";
+        urlStr="https://acc.kcwiki.org/start2/archives";
         
         byte[] buf = new byte[1024];  
         
@@ -77,7 +77,7 @@ public class Start2List {
                 conn = (HttpURLConnection) url.openConnection();  
                 conn.setDoOutput(true); 
                 conn.setRequestMethod("GET");  
-                conn.setRequestProperty("Host", "api.kcwiki.moe");  
+                conn.setRequestProperty("Host", "acc.kcwiki.org");  
                 conn.setRequestProperty("connection", "keep-alive");  
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
                 conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
@@ -140,14 +140,14 @@ public class Start2List {
                 try {
                     String[] arr= getStart2List();
                     for(String obj:arr){
-                        System.out.print(obj);
+                        System.out.println(obj);
                     }
                     int len=arr.length;
                     System.out.print(LINESEPARATOR);
                     System.out.println(arr[len-2].substring(1, arr[len-2].length()-1));
                     System.out.println(arr[len-1].substring(1, arr[len-1].length()-1));
-                    new Start2Api().GetStart2Api("http://api.kcwiki.moe/start2/"+arr[len-2].substring(1, arr[len-2].length()-1));
-                    new Start2Api().GetStart2Api("http://api.kcwiki.moe/start2/"+arr[len-1].substring(1, arr[len-1].length()-1));
+                    String oldStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-2].substring(1, arr[len-2].length()-1));
+                    String newStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-1].substring(1, arr[len-1].length()-1));
                 } catch (IOException ex) {
                     Logger.getLogger(Start2List.class.getName()).log(Level.SEVERE, null, ex);
                     return ;

@@ -40,7 +40,7 @@ public class DlCore {
             //client.getCredentialsProvider().setCredentials(new AuthScope("127.0.0.1",8888), new UsernamePasswordCredentials("", ""));
             
             /*
-            if(!(MainServer.getProxyhost().equals(""))){
+            if(!MainServer.isDebugMode()){
                 HttpHost proxy=new HttpHost(MainServer.getProxyhost(), MainServer.getProxyhost());
                 client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy); 
             }	

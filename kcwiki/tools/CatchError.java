@@ -33,7 +33,7 @@ public class CatchError {
     private static boolean init = false;
     private static final AtomicInteger count = new AtomicInteger(1);
     
-    public boolean init(){
+    public static boolean init(){
         if(init){return false;}
         /*
         String path = System.getProperty("java.class.path");

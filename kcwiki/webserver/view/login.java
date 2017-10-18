@@ -44,14 +44,14 @@ public class login extends HttpServlet{
     response.setContentType("text/xml");
     response.setContentType("text/html;charset=UTF-8;pageEncoding=UTF-8"); 
     
-    if(!MainServer.isInit()){
-        MainServer.init(); 
+    /*if(!MainServer.isInit()){
+        MainServer.init(false); 
         Controller.ininPool();
     }
     if(!isActivative){
-        userList = moe.kcwiki.webserver.util.userList.getUserList();
+            setUserList(moe.kcwiki.webserver.util.userList.getUserList());
         isActivative = true ;
-    }
+    }*/
     
     String username=request.getParameter("username");
     String password=request.getParameter("password");
@@ -92,5 +92,12 @@ public class login extends HttpServlet{
   {
     processRequest(request,response,"POST");
   }
+
+    /**
+     * @param aUserList the userList to set
+     */
+    public static void setUserList(HashMap<String, Object> aUserList) {
+        userList = aUserList;
+    }
 
 }
