@@ -35,6 +35,7 @@ import static moe.kcwiki.threadpool.start2dataPool.addTask;
 import static moe.kcwiki.threadpool.start2dataPool.getTaskNum;
 import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
+import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -49,7 +50,7 @@ public class DLThread {
         
     //Start2DataThread 核心下载线程
     public boolean start2() throws Exception{
-        final String npath=downloadpath;
+        final String rootFolder=MainServer.getDownloadFolder();
         Start2DataThread.addJob();
         
         final int taskID = start2dataPool.getTaskNum();
@@ -58,7 +59,7 @@ public class DLThread {
                 public Integer call() {
             String opPath=null;
             String fileName = null;
-            String filePath;
+            String filePath = null;
             //MainGui.jProgressBar1.setMaximum(DBCenter.AddressList.size());
             int value=0;
             int fFSum=0;
@@ -69,112 +70,112 @@ public class DLThread {
 
                     if(nextAddress.getKey().contains("/resources/swf/ships")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"swf"+File.separator+"ships";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"swf"+File.separator+"ships";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/slotitem/card")){
                         fileName=nextAddress.getValue();
                         fileName=fileName.substring(0,fileName.length()-4);
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+"Soubi"+fileName+Server.slotitemrule.get("card")+".png";
                     }
                                    
                     if(nextAddress.getKey().contains("/resources/image/slotitem/item_character")){
                         fileName=nextAddress.getValue();
                         fileName=fileName.substring(0,fileName.length()-4);
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+"Soubi"+fileName+Server.slotitemrule.get("item_character")+".png";
                     }
                                         
                     if(nextAddress.getKey().contains("/resources/image/slotitem/item_on")){
                         fileName=nextAddress.getValue();
                         fileName=fileName.substring(0,fileName.length()-4);
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+"Soubi"+fileName+Server.slotitemrule.get("item_on")+".png";
                     }
                                                             
                     if(nextAddress.getKey().contains("/resources/image/slotitem/item_up")){
                         fileName=nextAddress.getValue();
                         fileName=fileName.substring(0,fileName.length()-4);
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"slotitem"+File.separator+fileName+"-"+moe.kcwiki.database.DBCenter.NewSlotitemDB.get(fileName).getApi_name();
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+"Soubi"+fileName+Server.slotitemrule.get("item_up")+".png";
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/floor")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"floor";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"floor";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/wall")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"wall";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"wall";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/window")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"window";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"window";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/object")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"object";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"object";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/chest")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"chest";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"chest";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/furniture/desk")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"desk";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"furniture"+File.separator+"desk";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/image/useitem/card")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"image"+File.separator+"useitem"+File.separator+"card";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"image"+File.separator+"useitem"+File.separator+"card";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/swf/map")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"swf"+File.separator+"map";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"swf"+File.separator+"map";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(nextAddress.getKey().contains("/resources/swf/sound_b_bgm_")){
                         fileName=nextAddress.getValue();
-                        filePath=npath+File.separator+"resources"+File.separator+"swf";
-                        if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
+                        filePath=rootFolder+File.separator+"resources"+File.separator+"swf";
+                        //if  (!((new File(filePath).exists())&&( new File(filePath).isDirectory()))) { new File(filePath) .mkdirs();}
                         opPath=filePath+File.separator+fileName;
                     }
                     
                     if(!Controller.isIsPoolInit()){
-                        msgPublish.msgPublisher("Start2文件下载线程已强制退出。",0,0);
+                        msgPublish.msgPublisher("进程池被关闭,Start2文件下载线程已强制退出。",0,0);
                         return taskID;
                     }
                     
-                    int reCode=new DlCore().download(nextAddress.getKey(),opPath,proxyhost,proxyport);
+                    int reCode=new DlCore().download(nextAddress.getKey(),opPath,filePath,proxyhost,proxyport);
                     
                     if(reCode==1){ 
                         value++;  
@@ -192,6 +193,10 @@ public class DLThread {
                                 //msgPublish.msgPublisher("useitem:"+opPath,0,0);
                                 msgPublish.urlPrePublisher(opPath, fileName);
                             }
+                            if(! new File(MainServer.getWorksFolder()+File.separator+filePath).exists()){
+                                new File(MainServer.getWorksFolder()+File.separator+filePath).mkdirs();
+                            }
+                            FileUtils.copyFileToDirectory(new File(opPath), new File(MainServer.getWorksFolder()+File.separator+filePath));
                         }
                         //moe.kcwiki.massagehandler.MainGui.jProgressBar1.setValue(value); 
                     }
@@ -209,7 +214,7 @@ public class DLThread {
                 }
                 
                 if(isDownloadFinish==true){
-                    msgPublish.msgPublisher("文件全部下载完成！下载失败："+fFSum+"个文件。"+constant.LINESEPARATOR+"下载路径为："+npath+File.separator+"resources",0,0);
+                    msgPublish.msgPublisher("文件全部下载完成！下载失败："+fFSum+"个文件。"+constant.LINESEPARATOR+"下载路径为："+rootFolder+File.separator+"resources",0,0);
                 }else{
                     msgPublish.msgPublisher("文件下载失败。",0,0);
                     //JOptionPane.showMessageDialog(null, "文件下载失败。");
@@ -220,7 +225,7 @@ public class DLThread {
             }
             //new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(npath+File.separator+"resources"+File.separator+"swf"+File.separator+"ships");
             msgPublish.msgPublisher("Start2新数据下载完成",0,0);
-            new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(npath+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
+            new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
             return taskID;
         }   
         },taskID,"moe.kcwiki.downloader-DLThread-start2");  
@@ -228,8 +233,8 @@ public class DLThread {
     }
     
     //CoreDecrypt
-    public boolean modifieddata(String opPath,final String localpath,final String ffdecpath,int mode) {
-        final String npath=opPath;
+    public boolean modifieddata(String rootFolder,final String ffdecpath,int mode) {
+        //final String opPath=rootFolder;
         GetModifiedDataThread.addJob();
         final int taskID = getTaskNum();
             corePool.addTask(new Callable<Integer>() {
@@ -239,15 +244,13 @@ public class DLThread {
                 if(mode==1){
 
                     int value=0;
-                    //MainGui.jProgressBar1.setMaximum(CoreDecrypt.mapAddressList.size());
-                    if  (!((new File(npath).exists())&&new File(npath).isDirectory())) {new File(npath) .mkdirs();}
 
                     for (Map.Entry<String,String> nextAddress : CoreDecrypt.mapAddressList.entrySet()) {
                         if(nextAddress==null){continue;}
                         if(!nextAddress.getKey().contains("/resources/swf/map")){continue;}
-                        String opPath=npath+File.separator+nextAddress.getValue();
+                        String opPath=rootFolder+File.separator+nextAddress.getValue();
                         try{
-                            int reCode=new DlCore().download(nextAddress.getKey(),opPath,proxyhost,proxyport);
+                            int reCode=new DlCore().download(nextAddress.getKey(),opPath,rootFolder,proxyhost,proxyport);
 
                             if(reCode==1){ 
                                 value++;  
@@ -266,9 +269,9 @@ public class DLThread {
                             //return taskID;
                         }
                     }
-
-                    new moe.kcwiki.unpackswf.UnpackSwf().maps(localpath+File.separator+"temp"+File.separator+"ffoutput"+File.separator+"maps", npath);
-                    mapurlListPublisher(localpath+File.separator+"temp"+File.separator+"ffoutput"+File.separator+"maps");
+                    String decompressionFolder = MainServer.getWorksFolder()+File.separator+"maps";
+                    new moe.kcwiki.unpackswf.UnpackSwf().maps(decompressionFolder, rootFolder);
+                    mapurlListPublisher(decompressionFolder);
                     if(CoreDecrypt.mapAddressList.isEmpty()){
                         msgPublish.msgPublisher("数据库中没有新地图信息。",0,-1);
                     }else{
@@ -279,7 +282,7 @@ public class DLThread {
                 }
 
                 if(mode==2){
-                    final String npath=opPath;
+                    //final String opPath=rootFolder;
                     int value=0;
                    //MainGui.jProgressBar1.setMaximum(CoreDecrypt.shipAddressList.size());
                     for (Map.Entry<String,String> nextAddress : CoreDecrypt.shipAddressList.entrySet()) {
@@ -289,13 +292,13 @@ public class DLThread {
                         //String shipdata=shipDataList.get(nextAddress.getValue());
                         Ship ship=moe.kcwiki.database.DBCenter.NewShipDB.get(shipDataList.get(nextAddress.getKey()));
                         String filepath=ship.getApi_filename()+"-"+ship.getApi_name();
-                        if  (!((new File(npath+File.separator+filepath).exists())&&(new File(npath+File.separator+filepath).isDirectory()))) { new File(npath+File.separator+filepath) .mkdirs();}
                         String filename=nextAddress.getValue();
                         filename=Server.shipvoicerule.get(filename);
-                        String opPath=npath+File.separator+filepath+File.separator+shipDataList.get(nextAddress.getKey())+"-"+filename+".mp3";
+                        String folder = rootFolder+File.separator+filepath;
+                        String opPath=rootFolder+File.separator+filepath+File.separator+shipDataList.get(nextAddress.getKey())+"-"+filename+".mp3";
 
                         try{
-                            int reCode=new DlCore().download(nextAddress.getKey(),opPath,proxyhost,proxyport);
+                            int reCode=new DlCore().download(nextAddress.getKey(),opPath,folder,proxyhost,proxyport);
 
                             if(reCode==1){ 
                                 value++;  

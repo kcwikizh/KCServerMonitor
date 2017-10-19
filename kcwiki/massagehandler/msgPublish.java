@@ -126,15 +126,26 @@ public class msgPublish {
         String url;
         File[] fileList = new File(folder).listFiles();
         String files[] = {"5.jpg","7.jpg","17.png","19.png"};
+        String enemy[] = {"1.jpg","3.jpg"};
         //msgPublish.msgPublisher("fileList.length"+fileList.length,0,1);
         if(fileList!=null){
             String folderName = new File(folder).getName();
-            for(String file:files){
-                objMap.put("name", folderName);
-                objMap.put("src", folder+FILESEPARATOR+file);
-                getUrlList().add(objMap.clone());
-                objMap.clear();
+            if(fileList.length == 2){
+                for(String file:enemy){
+                    objMap.put("name", folderName);
+                    objMap.put("src", folder+FILESEPARATOR+file);
+                    getUrlList().add(objMap.clone());
+                    objMap.clear();
+                }
+            } else {
+                for(String file:files){
+                    objMap.put("name", folderName);
+                    objMap.put("src", folder+FILESEPARATOR+file);
+                    getUrlList().add(objMap.clone());
+                    objMap.clear();
+                }
             }
+            
         }         
         //msgPublish.msgPublisher("urlList.size()"+getUrlList().size(),0,1);
         Collections.reverse(getUrlList());

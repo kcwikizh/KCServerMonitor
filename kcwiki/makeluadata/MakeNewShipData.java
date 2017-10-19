@@ -36,7 +36,7 @@ public class MakeNewShipData {
         }
         if(ShipList.isEmpty()){return false;}
                 
-        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksPath()+File.separator+"lua_ship.json")), "UTF-8"))) {
+        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksFolder()+File.separator+"lua_ship.json")), "UTF-8"))) {
             
             Set<String> listkeys = ShipList.keySet();
             int count = 0;

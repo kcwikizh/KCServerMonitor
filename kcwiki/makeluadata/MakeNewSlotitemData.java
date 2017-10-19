@@ -27,7 +27,7 @@ public class MakeNewSlotitemData {
     public boolean WriteFile() throws FileNotFoundException, UnsupportedEncodingException, IOException{
         if(DBCenter.NewSlotitemDB.isEmpty()){return false;}
         
-        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksPath()+File.separator+"lua_weapon.json")), "UTF-8"))) {
+        try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksFolder()+File.separator+"lua_weapon.json")), "UTF-8"))) {
             Set<String> keys = DBCenter.NewSlotitemDB.keySet();
             int count = 0;
             for (String key : keys){

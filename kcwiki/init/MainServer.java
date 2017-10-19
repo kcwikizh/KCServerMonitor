@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import static java.lang.Thread.sleep;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +30,8 @@ import javax.servlet.http.HttpServlet;
 import moe.kcwiki.threadpool.Controller;
 import moe.kcwiki.tools.CatchError;
 import static moe.kcwiki.webserver.view.login.setUserList;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -37,58 +41,74 @@ import static moe.kcwiki.webserver.view.login.setUserList;
 //http://www.cnblogs.com/younggun/archive/2013/12/12/3470821.html
 public class MainServer {
 
-    private static String localpath;
-    private static String ffdecFolder;
-    private static String tempFolder;
-    private static String downloadFolder;
+    private static boolean useproxy; 
     private static String proxyhost;
     private static int proxyport;  
-    private static boolean useproxy; 
     private static String kcwikiServerAddress;  
     private static String dmmServerAddress;  
-    private static String dmmnetgamecookie; 
-    private static String dmmrequestrefreshcookie; 
     private static String oldstart2; 
     private static String newstart2; 
     private static String localoldstart2; 
-    private static String mapid; 
-    private static String seasonini; 
+    private static String mapid;  
     private static String slotitemno;
+    private static String seasonini;
     private static String KcUser;
     private static String KcPassword;
     private static boolean DebugMode = false;
     private static boolean stopScanner = false;
     private static boolean init = false;
     private static String webrootPath;
-    private static String dataPath;
-    private static String logPath;
-    private static String publishPath;
-    private static String tempPath;
-    private static String privatePath;
-    private static String worksPath;
+    private static String ffdecFolder;
+    private static String dataFolder;
+    private static String logFolder;
+    private static String publishFolder;
+    private static String worksFolder;
+    private static String tempFolder;
+    private static String downloadFolder;
+    private static String previousFolder;
+    private static String museumFolder;
+    private static Proxy httpproxy = null;
+    private static Long zipFolder = null;
     
-    public static HashMap<String, String> FileList = new HashMap<>();  
+    private static HashMap<String, String> FileList = new HashMap<>();  
     
     
     public static boolean init(boolean reinit){
-        if(init || !reinit){return false;}
+        if(isInit() || !reinit){return false;}
         try {
             //String path = Thread.currentThread().getContextClassLoader().getResource("/").getPath();
             String classPath = MainServer.class.getResource("/").toString();
-            String path = java.net.URLDecoder.decode(classPath.substring(5, classPath.length()), "utf-8");
+            String path = null;
+            if(System.getProperty("os.name").toLowerCase().startsWith("windows")){
+                path = java.net.URLDecoder.decode(classPath.substring(6, classPath.length()), "utf-8");
+            } else {
+                path = java.net.URLDecoder.decode(classPath.substring(5, classPath.length()), "utf-8");
+            }
             int lastIndex = path.lastIndexOf("/WEB-INF/classes/") ;
-            MainServer.webrootPath = path.substring(0, lastIndex);
-            MainServer.localpath = java.net.URLDecoder.decode(getWebrootPath() + FILESEPARATOR + "custom", "utf-8");
-            MainServer.dataPath = webrootPath + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom" + FILESEPARATOR + "data";
-            MainServer.logPath = webrootPath + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom" + FILESEPARATOR + "log";
-            MainServer.publishPath = MainServer.webrootPath + FILESEPARATOR + "Publishing";
-            MainServer.privatePath = webrootPath + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom" ;
-            MainServer.worksPath = MainServer.webrootPath + FILESEPARATOR + "works";
+            if(lastIndex == -1) {
+                webrootPath = path.substring(0, path.length()-1);
+            } else {
+                webrootPath = path.substring(0, lastIndex);
+            }
+            String publicPath = java.net.URLDecoder.decode(getWebrootPath() + FILESEPARATOR + "custom", "utf-8");
+            String privatePath = java.net.URLDecoder.decode(getWebrootPath() + FILESEPARATOR + "WEB-INF" + FILESEPARATOR + "custom", "utf-8"); 
+            MainServer.publishFolder = publicPath + FILESEPARATOR + "Publishing";
+            MainServer.worksFolder = publicPath + FILESEPARATOR + "works";
+            MainServer.dataFolder = privatePath + FILESEPARATOR + "data";
+            MainServer.logFolder = privatePath + FILESEPARATOR + "log";
+            MainServer.tempFolder = privatePath+ FILESEPARATOR + "temp"; 
+            MainServer.downloadFolder = privatePath+ FILESEPARATOR + "download"; 
+            MainServer.previousFolder = privatePath+ FILESEPARATOR + "previousswf"; 
+            MainServer.museumFolder = privatePath+ FILESEPARATOR + "previouszip"; 
+            FileUtils.deleteDirectory(new File(publicPath));
             
-            readini();
+            if(readini()) {
+                init = true;
+            } else {
+                init = false;
+            }
             //readseason();
-            init = true;
-            sleep(3000);
+            
             return true;
         } catch (UnsupportedEncodingException ex) {
             msgPublish.msgPublisher("UnsupportedEncodingException occurred \t Initialization Failed",0,-1); 
@@ -101,27 +121,24 @@ public class MainServer {
     }
     
     @SuppressWarnings("empty-statement")
-    public static void readini() {  
+    public static boolean readini() {  
         IniFile iniFile=new BasicIniFile();  
-        File file=new File(MainServer.getDataPath()+File.separator+"Preset.ini");  
+        File file=new File(MainServer.dataFolder+File.separator+"Preset.ini");  
         IniFileReader rad=new IniFileReader(iniFile,file);  
         try {  
             rad.read();  
             IniSection iniSection = iniFile.getSection("Main");
             MainServer.ffdecFolder = iniSection.getItem("ffdecFolder").getValue();  
             
-            while(!new File(MainServer.ffdecFolder).exists()||!MainServer.ffdecFolder.contains("ffdec.jar")){
+            if(!new File(MainServer.ffdecFolder).exists()||!MainServer.ffdecFolder.contains("ffdec.jar")) {
                 msgPublish.msgPublisher(constant.LINESEPARATOR+"检测不到ffdec.jar，请检查文件路径是否正确。",0,-1);  
-                return ;
             }
             
             MainServer.DebugMode = iniSection.getItem("debugMode").getValue().equals("1");
-            MainServer.tempFolder = getLocalpath()+ File.separator + iniSection.getItem("tempFolder").getValue(); 
-            MainServer.downloadFolder = getLocalpath()+ File.separator + iniSection.getItem("downloadFolder").getValue(); 
-            MainServer.localoldstart2 = getPrivatePath() + File.separator + iniSection.getItem("localOldstart2").getValue();
+            MainServer.localoldstart2 = MainServer.dataFolder + File.separator + iniSection.getItem("localOldstart2").getValue();
             MainServer.kcwikiServerAddress = iniSection.getItem("kcwikiServerAddress").getValue(); 
             if(isDebugMode()){
-                MainServer.dmmServerAddress = MainServer.kcwikiServerAddress;
+                MainServer.dmmServerAddress = MainServer.getKcwikiServerAddress();
             }else{
                 MainServer.dmmServerAddress = iniSection.getItem("dmmServerAddress").getValue(); 
             }
@@ -131,11 +148,14 @@ public class MainServer {
             MainServer.oldstart2 = iniSection.getItem("oldStart2").getValue();
             MainServer.seasonini = iniSection.getItem("seasonIni").getValue(); 
             
-            if(!(new File(tempFolder).exists()&&new File(tempFolder).isDirectory())){new File(getTempFolder()).mkdirs();}
-            if(!(new File(downloadFolder).exists()&&new File(downloadFolder).isDirectory())){new File(getDownloadFolder()).mkdirs();}
-            if(!(new File(logPath).exists()&&new File(logPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
-            if(!(new File(publishPath).exists() || new File(publishPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
-            if(!(new File(worksPath).exists() || new File(worksPath).isDirectory())){new File(getDownloadFolder()).mkdirs();}
+            if(!(new File(MainServer.tempFolder).exists()&&new File(MainServer.tempFolder).isDirectory())){new File(MainServer.tempFolder).mkdirs();}
+            if(!(new File(MainServer.dataFolder).exists()&&new File(MainServer.dataFolder).isDirectory())){new File(MainServer.dataFolder).mkdirs();}
+            if(!(new File(MainServer.downloadFolder).exists()&&new File(MainServer.downloadFolder).isDirectory())){new File(MainServer.downloadFolder).mkdirs();}
+            if(!(new File(MainServer.logFolder).exists()&&new File(MainServer.logFolder).isDirectory())){new File(MainServer.logFolder).mkdirs();}
+            if(!(new File(MainServer.publishFolder).exists() || new File(MainServer.publishFolder).isDirectory())){new File(MainServer.publishFolder).mkdirs();}
+            if(!(new File(MainServer.worksFolder).exists() || new File(MainServer.worksFolder).isDirectory())){new File(MainServer.worksFolder).mkdirs();}
+            if(!(new File(MainServer.previousFolder).exists() || new File(MainServer.previousFolder).isDirectory())){new File(MainServer.previousFolder).mkdirs();}
+            if(!(new File(MainServer.museumFolder).exists() || new File(MainServer.museumFolder).isDirectory())){new File(MainServer.museumFolder).mkdirs();}
             
             /*
             iniSection = iniFile.getSection("Lua");
@@ -152,6 +172,9 @@ public class MainServer {
             MainServer.useproxy = iniSection.getItem("enable").getValue().equals("1"); 
             MainServer.proxyport = Integer.parseInt(iniSection.getItem("port").getValue()); 
             MainServer.proxyhost = iniSection.getItem("host").getValue(); 
+            if(!StringUtils.isBlank(proxyhost)){
+                httpproxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxyhost, proxyport));
+            }
             
             iniSection = iniFile.getSection("Core");
             moe.kcwiki.unpackswf.Server.setCoremap(iniSection.getItem("coreMapArray").getValue());
@@ -178,21 +201,19 @@ public class MainServer {
             }
             setUserList(moe.kcwiki.webserver.util.userList.getUserList());
             
-            if(!(new File(tempFolder).exists()&&new File(tempFolder).isDirectory())){new File(getTempFolder()).mkdirs();}
-            if(!(new File(downloadFolder).exists()&&new File(downloadFolder).isDirectory())){new File(getDownloadFolder()).mkdirs();}
         } catch (IOException e) {
             msgPublish.msgPublisher(constant.LINESEPARATOR+"程序初始化失败，请检查ini文件是否完整。",0,-1);  
         }
-
+        return true;
     }
     
     private void initFileList(){
-        FileList.put(MainServer.getDataPath()+File.separator+"Preset.ini", "http://media.kcwiki.moe/kctoolssyn/Preset.ini");
-        FileList.put(MainServer.getDataPath()+File.separator+"season.ini", "http://media.kcwiki.moe/kctoolssyn/season.ini");
-        FileList.put(MainServer.getDataPath()+File.separator+"Filedata.txt", "http://media.kcwiki.moe/kctoolssyn/Filedata.txt");
-        FileList.put(MainServer.getDataPath()+File.separator+"unknowShip.txt", "http://media.kcwiki.moe/kctoolssyn/unknowShip.txt");
-        FileList.put(MainServer.getDataPath()+File.separator+"ShipgraphstdDB.txt", "http://media.kcwiki.moe/kctoolssyn/ShipgraphstdDB.txt");
-        FileList.put(MainServer.getDataPath()+File.separator+"oldstart2.json", "http://media.kcwiki.moe/kctoolssyn/oldstart2.json");
+        getFileList().put(MainServer.dataFolder+File.separator+"Preset.ini", "http://media.kcwiki.moe/kctoolssyn/Preset.ini");
+        getFileList().put(MainServer.dataFolder+File.separator+"season.ini", "http://media.kcwiki.moe/kctoolssyn/season.ini");
+        getFileList().put(MainServer.dataFolder+File.separator+"Filedata.txt", "http://media.kcwiki.moe/kctoolssyn/Filedata.txt");
+        getFileList().put(MainServer.dataFolder+File.separator+"unknowShip.txt", "http://media.kcwiki.moe/kctoolssyn/unknowShip.txt");
+        getFileList().put(MainServer.dataFolder+File.separator+"ShipgraphstdDB.txt", "http://media.kcwiki.moe/kctoolssyn/ShipgraphstdDB.txt");
+        getFileList().put(MainServer.dataFolder+File.separator+"oldstart2.json", "http://media.kcwiki.moe/kctoolssyn/oldstart2.json");
     }
     
     
@@ -201,7 +222,7 @@ public class MainServer {
         BufferedReader br = null;
         String line;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(getLocalpath()+File.separator+seasonini)), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(MainServer.dataFolder+File.separator+getSeasonini())), "UTF-8"));
             while((line=br.readLine()) != null)
             {
                 if(line.contains("=")){
@@ -219,12 +240,6 @@ public class MainServer {
         }
     }
 
-    /**
-     * @return the localpath
-     */
-    public static String getLocalpath() {
-        return localpath;
-    }
 
     /**
      * @return the ffdecFolder
@@ -262,24 +277,10 @@ public class MainServer {
     }
 
     /**
-     * @return the dmmnetgamecookie
-     */
-    public static String getDmmnetgamecookie() {
-        return dmmnetgamecookie;
-    }
-
-    /**
-     * @return the dmmrequestrefreshcookie
-     */
-    public static String getDmmrequestrefreshcookie() {
-        return dmmrequestrefreshcookie;
-    }
-
-    /**
      * @return the oldstart2data
      */
     public static String getLocaloldstart2data() {
-        return localoldstart2;
+        return getLocaloldstart2();
     }
 
     /**
@@ -311,20 +312,6 @@ public class MainServer {
     }
 
     /**
-     * @param aDmmnetgamecookie the dmmnetgamecookie to set
-     */
-    public static void setDmmnetgamecookie(String aDmmnetgamecookie) {
-        dmmnetgamecookie = aDmmnetgamecookie;
-    }
-
-    /**
-     * @param aDmmrequestrefreshcookie the dmmrequestrefreshcookie to set
-     */
-    public static void setDmmrequestrefreshcookie(String aDmmrequestrefreshcookie) {
-        dmmrequestrefreshcookie = aDmmrequestrefreshcookie;
-    }
-
-    /**
      * @return the DebugMode
      */
     public static boolean isDebugMode() {
@@ -346,63 +333,10 @@ public class MainServer {
     }
 
     /**
-     * @return the webrootPath
-     */
-    public static String getWebrootPath() {
-        return webrootPath;
-    }
-
-    /**
      * @return the init
      */
     public static boolean isInit() {
         return init;
-    }
-
-    /**
-     * @return the dataPath
-     */
-    public static String getDataPath() {
-        return dataPath;
-    }
-
-    /**
-     * @return the logPath
-     */
-    public static String getLogPath() {
-        return logPath;
-    }
-
-    
-    /**
-     * @return the privatePath
-     */
-    public static String getPrivatePath() {
-        return privatePath;
-    }
-
-    /**
-     * @return the tempPath
-     */
-    public static String getTempPath() {
-        return tempPath;
-    }
-
-    /**
-     * @return the publishPath
-     */
-    public static String getPublishPath() {
-        return publishPath;
-    }
-    
-    
-    public MainServer(){}
-    
-    /**
-     * @return the proxyhost
-     */
-    public static String getProxyhost() {
-        return proxyhost;
     }
 
     /**
@@ -439,12 +373,109 @@ public class MainServer {
     public static void setSlotitemno(String aSlotitemno) {
         slotitemno = aSlotitemno;
     }
-
+    
     /**
-     * @return the worksPath
+     * @return the proxyhost
      */
-    public static String getWorksPath() {
-        return worksPath;
+    public static String getProxyhost() {
+        return proxyhost;
     }
 
+    /**
+     * @return the localoldstart2
+     */
+    public static String getLocaloldstart2() {
+        return localoldstart2;
+    }
+
+    /**
+     * @return the seasonini
+     */
+    public static String getSeasonini() {
+        return seasonini;
+    }
+
+    /**
+     * @return the dataFolder
+     */
+    public static String getDataFolder() {
+        return dataFolder;
+    }
+
+    /**
+     * @return the logFolder
+     */
+    public static String getLogFolder() {
+        return logFolder;
+    }
+
+    /**
+     * @return the publishFolder
+     */
+    public static String getPublishFolder() {
+        return publishFolder;
+    }
+
+    /**
+     * @return the worksFolder
+     */
+    public static String getWorksFolder() {
+        return worksFolder;
+    }
+
+    /**
+     * @return the FileList
+     */
+    public static HashMap<String, String> getFileList() {
+        return FileList;
+    }
+
+    /**
+     * @return the useproxy
+     */
+    public static boolean isUseproxy() {
+        return useproxy;
+    }
+
+    /**
+     * @return the webrootPath
+     */
+    public static String getWebrootPath() {
+        return webrootPath;
+    }
+
+    /**
+     * @return the previousFolder
+     */
+    public static String getPreviousFolder() {
+        return previousFolder;
+    }
+
+    /**
+     * @return the httpproxy
+     */
+    public static Proxy getHttpproxy() {
+        return httpproxy;
+    }
+
+    /**
+     * @return the museumFolder
+     */
+    public static String getMuseumFolder() {
+        return museumFolder;
+    }
+
+    /**
+     * @return the zipFolder
+     */
+    public static Long getZipFolder() {
+        return zipFolder;
+    }
+
+    /**
+     * @param aZipFolder the zipFolder to set
+     */
+    public static void setZipFolder(Long aZipFolder) {
+        zipFolder = aZipFolder;
+    }
 }

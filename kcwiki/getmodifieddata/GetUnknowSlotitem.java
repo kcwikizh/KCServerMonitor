@@ -49,8 +49,6 @@ import moe.kcwiki.tools.constant;
  */
 public class GetUnknowSlotitem {
     private final String slotitemNo;
-    private final String localpath;
-    private final String localoldstart2;
     private final String proxyhost;
     private final int proxyport;
     private static String serveraddress;
@@ -58,12 +56,11 @@ public class GetUnknowSlotitem {
     private static int servernum=0;
     public static LinkedHashMap<String, String> unknowShipList = new LinkedHashMap<>(); 
     private final java.util.ArrayList<String>  dataList;
+    private final String rootFolder = MainServer.getTempFolder() + File.separator+"newSlotItem";
     String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
     String[] serverlistname=new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
         
     public GetUnknowSlotitem(){
-        this.localpath = moe.kcwiki.init.MainServer.getLocalpath();
-        this.localoldstart2 = moe.kcwiki.init.MainServer.getLocaloldstart2data();
         this.proxyhost = moe.kcwiki.init.MainServer.getProxyhost();
         this.proxyport = moe.kcwiki.init.MainServer.getProxyport();
         slotitemNo = moe.kcwiki.init.MainServer.getSlotitemno();
@@ -102,7 +99,7 @@ public class GetUnknowSlotitem {
                              //msgPublish.msgPublisher("slotitemNo: "+slotitemNo,0,1);
                             if(no != Integer.valueOf(slotitemNo)&& no > 350){
                                 msgPublish.msgPublisher("扫描到新装备，已下载完毕",0,1);
-                                msgPublish.urlListPublisher(localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"card","newSlotitem");
+                                msgPublish.urlListPublisher(rootFolder+File.separator+"card","newSlotitem");
                                 return taskID;
                             }
                             if(no>300){
@@ -134,16 +131,16 @@ public class GetUnknowSlotitem {
         String filepath = null;
         
         if(URL.contains("card")){
-            filepath=localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"card";
+            filepath=rootFolder+File.separator+"card";
         }
         if(URL.contains("item_character")){
-            filepath=localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"item_character";
+            filepath=rootFolder+File.separator+"item_character";
         }
         if(URL.contains("item_on")){
-            filepath=localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"item_on";
+            filepath=rootFolder+File.separator+"item_on";
         }
         if(URL.contains("item_up")){
-            filepath=localpath+File.separator+"download"+File.separator+"newSlotItem"+File.separator+"item_up";
+            filepath=rootFolder+File.separator+"item_up";
         }
         
         URL serverUrl = new URL(URL);
@@ -170,10 +167,11 @@ public class GetUnknowSlotitem {
         }
         if(message.contains("HTTP/1.1 403")){
             urlcon.disconnect();
+            serverAddress();
+            return false;
         }
         if(message.contains("HTTP/1.1 404 Not Found")){
             urlcon.disconnect();
-            //msgPublish.msgPublisher(filename+"\t找不到文件",0,-1);
         }
         if(urlcon.getLastModified()==0){
             urlcon.disconnect();
@@ -182,11 +180,10 @@ public class GetUnknowSlotitem {
         }
         if(message.contains("HTTP/1.1 304 Not Modified")){
             urlcon.disconnect();
-            msgPublish.msgPublisher(filename+"\t文件相同",0,0);
         }
         if(message.contains("HTTP/1.1 200 OK")){
             urlcon.disconnect();
-            if  (!(new File(filepath).exists())||!(new File(filepath).isDirectory())) {
+            if  (!(new File(filepath).exists()) || !(new File(filepath).isDirectory())) {
                 new File(filepath) .mkdirs();  
             }
             if(new DlCore().download(URL, filepath+File.separator+filename,proxyhost,proxyport)){
@@ -209,43 +206,6 @@ public class GetUnknowSlotitem {
     
     public static void main(String[] args){
         //new GetUnknowSlotitem().getUnknowData();
-        try {
-            //new GetUnknowSlotitem().getUnknowData();
-            HttpURLConnection connection = (HttpURLConnection) new URL("http://fp.ip-api.com/json").openConnection();
-            connection.setRequestProperty("Host", "fp.ip-api.com");
-            connection.setRequestProperty("Origin", "http://ip-api.com");
-            connection.setRequestProperty("Referer", "http://ip-api.com/");
-            connection.setRequestProperty("Connection", "keep-alive");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
-            connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-            connection.setRequestProperty("DNT", "1");
-            connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
-            // 建立实际的连接
-            connection.setRequestMethod("GET");
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            if (responseCode == 200) {
-                InputStream is = connection.getInputStream();
-                byte[] by = new byte[1024];
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-                // 将内容读取内存中
-                int len = -1;
-                while ((len = is.read(by)) != -1) {
-                    bos.write(by, 0, len);
-                }
-                // 关闭流
-                is.close();
-                JSONObject jobj = JSON.parseObject(bos.toString("utf-8"));
-                jobj.get("query");
-            }
-        } catch (ProtocolException ex) {
-            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
 }

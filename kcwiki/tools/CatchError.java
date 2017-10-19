@@ -43,7 +43,7 @@ public class CatchError {
         String localpath = java.net.URLDecoder.decode(realPath, "utf-8");
         */
         
-        String logpath = MainServer.getLogPath();
+        String logpath = MainServer.getLogFolder();
         try {
             time = new Date();
             new File(logpath).mkdirs();

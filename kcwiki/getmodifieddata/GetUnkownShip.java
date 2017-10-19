@@ -57,7 +57,6 @@ import moe.kcwiki.tools.constant;
 public class GetUnkownShip {
     private final String unknowShipFile;
     private static String intputFile;
-    private final String localpath;
     private final String localoldstart2;
     private final String proxyhost;
     private final int proxyport;
@@ -69,17 +68,17 @@ public class GetUnkownShip {
     private final static List<JSONObject> md5DataList = new ArrayList<>();
     //private final static LinkedHashMap<String,JSONObject> md5DataMap = new LinkedHashMap<>();
     private GetHash Hash = new GetHash();
+    private final String rootFolder = MainServer.getTempFolder()+File.separator+"newShip";
     //private final java.util.ArrayList<String>  dataList;
     
     
     public GetUnkownShip(){
-        this.localpath = moe.kcwiki.init.MainServer.getLocalpath();
         //this.localpath = "L:\\NetBeans\\NetBeansProjects\\moe kcwiki stdunpacktools\\build";
         this.localoldstart2 = moe.kcwiki.init.MainServer.getLocaloldstart2data();
         //this.localoldstart2 = MainServer.getDataPath()+File.separator+"oldstart2.json";
         this.proxyhost = moe.kcwiki.init.MainServer.getProxyhost();
         this.proxyport = moe.kcwiki.init.MainServer.getProxyport();
-        unknowShipFile = MainServer.getDataPath()+File.separator+"unknowShip";
+        unknowShipFile = MainServer.getDataFolder()+File.separator+"unknowShip";
         //dataList = new  java.util.ArrayList<>();
         serverAddress();
     }
@@ -87,7 +86,7 @@ public class GetUnkownShip {
     public boolean loadKnewFile(){
         String line;
         String str = "";
-        String ipFile=MainServer.getDataPath()+File.separator+"shipgraphdata.json";
+        String ipFile=MainServer.getDataFolder()+File.separator+"shipgraphdata.json";
         if(!new File(ipFile).exists()){
             msgPublish.msgPublisher("找不到Md5的扫描文件，请向技术组索取。",0,-1);
             return false;
@@ -313,7 +312,6 @@ public class GetUnkownShip {
         addTask(new Callable<Integer>() {
                 @Override
                 public Integer call() {
-                    
                         GetUnkownShip rename=new GetUnkownShip();
                         while(md5DataList!=null){
                             Iterator<JSONObject> it = md5DataList.iterator();     
@@ -328,7 +326,7 @@ public class GetUnkownShip {
                                         it.remove();
                                         int i=data.getString("path").lastIndexOf("/"); //取得子串的初始位置
                                         String filename=data.getString("path").substring(i+1,data.getString("path").length());
-                                        if(md5DataSet.contains(Hash.getNewHash(localpath+File.separator+"download"+File.separator+"newShip"+File.separator+filename+".swf"))){
+                                        if(md5DataSet.contains(Hash.getNewHash(rootFolder+File.separator+filename+".swf"))){
                                             continue;
                                         }
                                         rename.renameShipSwf(filename);
@@ -400,7 +398,6 @@ public class GetUnkownShip {
     public synchronized boolean getMDD(String URL,Long timestamp) throws MalformedURLException, IOException, InterruptedException, Exception{
         int i=URL.lastIndexOf("/"); //取得子串的初始位置
         String filename=URL.substring(i+1,URL.length());
-        String filepath=localpath+File.separator+"download"+File.separator+"newShip";
         
         URL serverUrl = new URL(URL);
         HttpURLConnection urlcon;
@@ -425,10 +422,11 @@ public class GetUnkownShip {
         }
         if(message.contains("HTTP/1.1 403")){
             urlcon.disconnect();
+            serverAddress();
+            return false;
         }
         if(message.contains("HTTP/1.1 404 Not Found")){
             urlcon.disconnect();
-            //msgPublish.msgPublisher(filename+"\t找不到文件",0,-1);
         }
         if(urlcon.getLastModified()==0){
             urlcon.disconnect();
@@ -437,14 +435,13 @@ public class GetUnkownShip {
         }
         if(message.contains("HTTP/1.1 304 Not Modified")){
             urlcon.disconnect();
-            msgPublish.msgPublisher(filename+"\t文件相同",0,0);
         }
         if(message.contains("HTTP/1.1 200 OK")){
             urlcon.disconnect();
-            if  (!(new File(filepath).exists())||!(new File(filepath).isDirectory())) {
-                new File(filepath) .mkdirs();  
+            if  (!(new File(rootFolder).exists()) || !(new File(rootFolder).isDirectory())) {
+                new File(rootFolder) .mkdirs();  
             }
-            if(new DlCore().download(URL, filepath+File.separator+filename,proxyhost,proxyport)){
+            if(new DlCore().download(URL, rootFolder+File.separator+filename,proxyhost,proxyport)){
                 //msgPublish.msgPublisher(filename+"\t下载完成",1,0);    
             } 
             return true;
@@ -464,24 +461,23 @@ public class GetUnkownShip {
         }
     }
     
+    
     public boolean renameShipSwf(String shipname){
         
-        String filename;
-        String newfilepath;
-        String shipFolder=localpath+File.separator+"temp"+File.separator+"newShip"+File.separator+shipname;
-        String shipFile=localpath+File.separator+"download"+File.separator+"newShip"+File.separator+shipname+".swf";
+        String publishFolder=MainServer.getPublishFolder()+File.separator+"newShip"+File.separator+shipname;
+        String shipFile=rootFolder+File.separator+shipname+".swf";
         
-        new moe.kcwiki.unpackswf.UnpackSwf().ffdec(shipFolder, shipFile);
+        new moe.kcwiki.unpackswf.UnpackSwf().ffdec(publishFolder, shipFile);
         
-            File[] fileList = new File(shipFolder+File.separator+"images").listFiles();
-            if(fileList!=null){
-                for (File file : fileList) {
-                    if(fileList.length==15){
+        File[] fileList = new File(publishFolder+File.separator+"images").listFiles();
+        if(fileList!=null){
+            /*for (File file : fileList) {
+                if(fileList.length==15){
                         
-                    }
-                }  
+                }
+            }*/
                 
-            msgPublish.unkonwedShipListPublisher(shipFolder+File.separator+"images");
+            msgPublish.unkonwedShipListPublisher(publishFolder+File.separator+"images");
             return true;
         }
         return false;

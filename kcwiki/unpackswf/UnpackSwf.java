@@ -38,7 +38,7 @@ public class UnpackSwf {
             if(shellString == null || shellString.length() == 0) {return false;}
             
             String[] cmd = { "sh", "-c", shellString };
-            try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+FILESEPARATOR+"ShellLogs.txt"),true), "UTF-8"))) {
+            try (BufferedWriter eBfw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getWorksFolder()+FILESEPARATOR+"ShellLogs.txt"),true), "UTF-8"))) {
                 Process pcs=Runtime.getRuntime().exec(cmd);
                 String line;  
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(pcs.getInputStream()))) {

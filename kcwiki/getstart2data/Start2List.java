@@ -5,6 +5,16 @@
  */
 package moe.kcwiki.getstart2data;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.Feature;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,11 +27,14 @@ import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import javax.swing.JOptionPane;
 import moe.kcwiki.init.MainServer;
+import moe.kcwiki.tools.RWFile;
 import static moe.kcwiki.tools.constant.LINESEPARATOR;
 
 /**
@@ -44,7 +57,7 @@ public class Start2List {
             in = conn1.getInputStream();
             String str = "";  
             while (in.read(buf) != -1) {
-                str = new String(buf);
+                str += new String(buf);
                 //System.out.print(str); 
             }
             try{
@@ -146,8 +159,85 @@ public class Start2List {
                     System.out.print(LINESEPARATOR);
                     System.out.println(arr[len-2].substring(1, arr[len-2].length()-1));
                     System.out.println(arr[len-1].substring(1, arr[len-1].length()-1));
-                    String oldStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-2].substring(1, arr[len-2].length()-1));
-                    String newStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-1].substring(1, arr[len-1].length()-1));
+                    //String oldStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-2].substring(1, arr[len-2].length()-1));
+                    //String newStart2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[len-1].substring(1, arr[len-1].length()-1));
+                    
+                    for(int id=122; id+1<arr.length; id++) {
+                        String str1 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[id].substring(1, arr[len-2].length()-1));
+                        String str2 = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/"+arr[id+1].substring(1, arr[len-2].length()-1));
+                        JSONObject jobj1 = JSON.parseObject(str1);
+                        JSONObject jobj2 = JSON.parseObject(str2);
+                        String jstr1 = JSON.toJSONString(jobj1);
+                        String jstr2 = JSON.toJSONString(jobj2);
+                        /*RWFile.writeLog(str1, "E:\\kc\\kc1.json");
+                        RWFile.writeLog(str2, "E:\\kc\\kc2.json");*/
+                        HashMap<String,Object> data1 = JSON.parseObject(str1,new TypeReference<LinkedHashMap<String, Object>>() {},Feature.SortFeidFastMatch);
+                        HashMap<String,Object> data2 = JSON.parseObject(str2,new TypeReference<LinkedHashMap<String, Object>>() {},Feature.SortFeidFastMatch);
+                        String jstr3 = JSON.toJSONString(data1);
+                        String jstr4 = JSON.toJSONString(data2);
+                        JSONObject jobj3 = JSON.parseObject(jstr3);
+                        JSONObject jobj4 = JSON.parseObject(jstr4);
+                        jstr3 = jobj3.toJSONString();
+                        jstr4 = jobj4.toJSONString();
+                        RWFile.writeLog(jobj3.toString(), "E:\\kc\\kc1.json");
+                        RWFile.writeLog(jobj4.toString(), "E:\\kc\\kc2.json");
+                        if(jstr3.equals(jstr4)){
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        }  
+                        if(jobj3.equals(jobj4)){
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                            //System.out.println(jobj3.toString()+"\t equals: "+jobj4.toString());
+                        }
+                        /*if(jsonEquals.jsonEquals(jstr3, jstr4)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        }*/
+                        if(jstr1.equals(jstr2)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        } 
+                        if(jobj1.equals(jobj2)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        } 
+                        if(data1.equals(data2)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        } 
+                        JsonParser parser = new JsonParser();  
+                        JsonObject obj = (JsonObject) parser.parse(str1);  
+                        JsonParser parser1 = new JsonParser();  
+                        JsonObject obj1 = (JsonObject) parser1.parse(str2);  
+                        if(obj.equals(obj1)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        } 
+                        Gson gson1 = new GsonBuilder().create();//or new Gson()   
+                        JsonElement e1 = gson1.toJsonTree(str1);//or new Gson()   
+                        Gson gson2 = new GsonBuilder().create();  
+                        JsonElement e2 = gson2.toJsonTree(str2); 
+                        if(e1.equals(e2)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        }  
+                        JsonElement e3 = new JsonPrimitive(str1);  
+                        JsonElement e4 = new JsonPrimitive(str2);  
+                        if(e3.equals(e4)) {
+                            System.out.println(arr[id]+"\t equals: "+arr[id+1]);
+                        } else {
+                            System.out.println(arr[id]+"\t not equals: "+arr[id+1]);
+                        } 
+                        
+                        //System.out.println(new moe.kcwiki.json.JSONObject(str1).similar(str2));
+                        
+                        System.out.println();
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(Start2List.class.getName()).log(Level.SEVERE, null, ex);
                     return ;

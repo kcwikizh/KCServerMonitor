@@ -43,7 +43,7 @@ public class RenameShipSwf {
                 String shipFolder;
                 String filename;
                 String newfilepath;
-                String outputPath=MainServer.getTempFolder()+File.separator+"ffoutput"+File.separator+"ships";
+                String outputPath=MainServer.getWorksFolder()+File.separator+"ships";
                 if(!DBCenter.NewShipDB.isEmpty()){
                     //for( Map.Entry<String,Ship> map : DBCenter.NewShipDB.entrySet()){
                     DBCenter.NewShipDB.entrySet().forEach((map) -> {
@@ -209,7 +209,7 @@ public class RenameShipSwf {
                 }
                 //msgPublish.urlListPublisher(MainServer.getPublishPath()+FILESEPARATOR+"ship", "newShip");
                 msgPublisher("ShipList: "+ShipList.size(),0,0);
-                msgPublish.shipPrePublisher(MainServer.getPublishPath()+FILESEPARATOR+"ship");
+                msgPublish.shipPrePublisher(MainServer.getPublishFolder()+FILESEPARATOR+"ship");
                 //msgPublish.msgPublisher(JSON.toJSONString(msgPublish.getUrlprePublishList()),0,0);
                 msgPublisher("舰娘重命名子线程运行结束",0, 1);
                 start2dataPool.shutdown();
@@ -220,8 +220,8 @@ public class RenameShipSwf {
     
     private boolean copyToPublish(String filepath,String filename){
         try {
-            //msgPublish.msgPublisher("copyToPublish:"+filepath+"\t"+MainServer.getPublishPath()+FILESEPARATOR+"ship"+FILESEPARATOR+filename,0, -1);
-            FileUtils.copyFile(new File(filepath),new File(MainServer.getPublishPath()+FILESEPARATOR+"ship"+FILESEPARATOR+filename));
+            //msgPublish.msgPublisher("copyToPublish:"+filepath+"\t"+MainServer.getPublishFolder()+FILESEPARATOR+"ship"+FILESEPARATOR+filename,0, -1);
+            FileUtils.copyFile(new File(filepath),new File(MainServer.getPublishFolder()+FILESEPARATOR+"ship"+FILESEPARATOR+filename));
             
             return true;
         } catch (IOException ex) {

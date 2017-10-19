@@ -1,6 +1,7 @@
 
 package moe.kcwiki.downloader;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -21,14 +22,13 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.constant;
+import org.apache.commons.lang3.StringUtils;
         
 public class DlCore {
-    static String Path;
-    static String url;
     
-    public int download(String furl,String fPath,String proxyhost,int proxyport) {
-        if(furl==null||"".equals(furl)){return 2;}
-        if(!furl.contains("http://")){return 2;}
+    public int download(String furl,String fPath,String folder,String proxyhost,int proxyport) {
+        if(furl==null|| StringUtils.isBlank(furl)){return 2;}
+        if(!furl.contains("http")){return 2;}
         
         try{
             URL serverUrl = new URL(furl);
@@ -46,17 +46,17 @@ public class DlCore {
             urlcon.connect();
 
             int responseCode = urlcon.getResponseCode();//文件存在‘HTTP/1.1 200 OK’ 文件不存在 ‘HTTP/1.1 404 Not Found’
-            if (responseCode==404) {return 2;}
+            if (responseCode==404) {urlcon.disconnect();return 2;}
             if(responseCode<=300){
                 urlcon.disconnect();
-
-                Path=fPath;
-                url=furl;
+                if  (!((new File(folder).exists()) || (new File(folder).isDirectory()))) { 
+                    new File(folder) .mkdirs();
+                }
 
                 try{
-                    final RandomAccessFile file = new RandomAccessFile(Path, "rw");
+                    final RandomAccessFile file = new RandomAccessFile(fPath, "rw");
                     org.apache.http.client.HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(url);
+                    HttpGet get = new HttpGet(furl);
                     if(!MainServer.isDebugMode()){
                         HttpHost proxy=new HttpHost(MainServer.getProxyhost(), MainServer.getProxyport());
                         client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy); 

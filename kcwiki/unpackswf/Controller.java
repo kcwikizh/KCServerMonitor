@@ -17,34 +17,32 @@ import moe.kcwiki.tools.constant;
  * @author x5171
  */
 public class Controller {
-    private final String localpath;
-    private final String oldswfpath;
-    private final String unpackswfpath;    
+    private final String previousfolder;
+    private final String currentfolder;    
     private final UnpackSwf ffdec;
     private final moe.kcwiki.picscanner.Controller verify;
     
     
     public Controller() throws IOException{
-        this.localpath = MainServer.getLocalpath();
-        this.unpackswfpath = MainServer.getTempFolder()+File.separator+"unpackswf";
-        this.oldswfpath = MainServer.getDataPath()+File.separator+"oldswfdata";
-        if(!new File(unpackswfpath).exists()){new File(unpackswfpath).mkdirs();}
+        this.currentfolder = MainServer.getTempFolder()+File.separator+"currentswf";
+        this.previousfolder = MainServer.getPreviousFolder();
+        if(!new File(currentfolder).exists()){new File(currentfolder).mkdirs();}
         ffdec=new UnpackSwf();
         verify=new moe.kcwiki.picscanner.Controller();
     }
     
     public void Analysis(String filename,String filepath,String sourcepath) throws InterruptedException, Exception{
-        String outputpath=unpackswfpath+File.separator+sourcepath+File.separator+(filename.substring(0, filename.length()-4));
+        String outputpath=currentfolder+File.separator+sourcepath+File.separator+(filename.substring(0, filename.length()-4));
         if(filename.contains("Core")){
-            if(!new moe.kcwiki.decryptcore.CoreRecover().unlockCore(filepath+File.separator+filename, localpath+File.separator+"temp")){msgPublish.msgPublisher("Core.swf 解码失败。",0,-1);}
-            ffdec.ffdec(outputpath,localpath+File.separator+"temp"+File.separator+"Core_hack.swf");
+            if(!new moe.kcwiki.decryptcore.CoreRecover().unlockCore(filepath+File.separator+filename, MainServer.getTempFolder())){msgPublish.msgPublisher("Core.swf 解码失败。",0,-1);}
+            ffdec.ffdec(outputpath,MainServer.getTempFolder()+File.separator+"Core_hack.swf");
             new moe.kcwiki.decryptcore.CoreDecrypt().getData(outputpath+File.separator+Server.getCoremap(), outputpath+File.separator+Server.getCoresound());
         }
-        if(new File(oldswfpath+File.separator+(filename.substring(0, filename.length()-4))).exists()){
+        if(new File(previousfolder+File.separator+(filename.substring(0, filename.length()-4))).exists()){
             msgPublish.msgPublisher(filename+"开始解压分析",0,0);
             ffdec.ffdec(outputpath,filepath+File.separator+filename);
-            new VerifyScr().verifyscr(outputpath+File.separator+"scripts", oldswfpath+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"scripts");
-            verify.verifyimg(outputpath+File.separator+"images", oldswfpath+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"images");
+            new VerifyScr().verifyscr(outputpath+File.separator+"scripts", previousfolder+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"scripts");
+            verify.verifyimg(outputpath+File.separator+"images", previousfolder+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"images");
         } 
     }
 }

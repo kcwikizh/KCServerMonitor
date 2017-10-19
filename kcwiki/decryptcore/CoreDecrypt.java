@@ -40,7 +40,6 @@ import moe.kcwiki.tools.constant;
  */
 public class CoreDecrypt {
     private final String tppath;
-    private final String lcpath;
     private final String ffpath;
     private String mapCode;
     private String soundCode;
@@ -56,7 +55,6 @@ public class CoreDecrypt {
     public CoreDecrypt(){
         this.tppath=MainServer.getTempFolder();
         this.ffpath=MainServer.getFfdecFolder();
-        this.lcpath=MainServer.getLocalpath();
         this.kcwikiserver=MainServer.getKcwikiServerAddress();
         runtime=Runtime.getRuntime();
     }
@@ -95,7 +93,7 @@ public class CoreDecrypt {
                     
                     ecryptMap(mapCode,moe.kcwiki.init.MainServer.getMapid());
                     AnalyzeList.shipData();
-                    new moe.kcwiki.downloader.DLThread().modifieddata(lcpath+File.separator+"download"+File.separator+"Maps",lcpath,ffpath, 1);
+                    new moe.kcwiki.downloader.DLThread().modifieddata(MainServer.getDownloadFolder()+File.separator+"Maps",ffpath, 1);
                     
                     while(!moe.kcwiki.init.Start2DataThread.isHasStart2()){
                         if(!GetModifiedDataThread.getTimeStamp().equals(timeStamp)){
@@ -117,7 +115,7 @@ public class CoreDecrypt {
                     ecryptSound(soundCode); 
                     AnalyzeList.voiceData(soundCode);
                     msgPublish.msgPublisher("开始下载语音数据。",0,0);
-                    new moe.kcwiki.downloader.DLThread().modifieddata(lcpath+File.separator+"download"+File.separator+"ShipVoice",lcpath,ffpath, 2);
+                    new moe.kcwiki.downloader.DLThread().modifieddata(MainServer.getDownloadFolder()+File.separator+"ShipVoice",ffpath, 2);
                 } catch (UnsupportedEncodingException ex) {
                     msgPublish.msgPublisher("moe.kcwiki.decryptcore-CoreDecrypt-getData:UnsupportedEncodingException",0,-1);  
                     Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
@@ -230,7 +228,7 @@ public class CoreDecrypt {
         String data;
         String shipfilename;
             
-        int i=0;
+        //int i=0;
             
         try (FileWriter fout = new FileWriter(new File(tppath+File.separator+"Core-ShipVoice.txt"))) {
             fout.write(new Date()+constant.LINESEPARATOR+constant.LINESEPARATOR+"舰娘音频下载链接："+constant.LINESEPARATOR+constant.LINESEPARATOR); 

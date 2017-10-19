@@ -22,20 +22,15 @@ import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.constant;
         
 public class DlCore {
-    private  String Path;
-    private  String url;
             
     
     public synchronized boolean download(String furl,String fPath,String proxyhost,int proxyport) {
         
-        Path=fPath;
-        url=furl;
-        
         try{
-            final RandomAccessFile file = new RandomAccessFile(Path, "rw");
+            final RandomAccessFile file = new RandomAccessFile(fPath, "rw");
             org.apache.http.client.HttpClient client = new DefaultHttpClient();
             
-            HttpGet get = new HttpGet(url);
+            HttpGet get = new HttpGet(furl);
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
             //client.getCredentialsProvider().setCredentials(new AuthScope("127.0.0.1",8888), new UsernamePasswordCredentials("", ""));
             

@@ -37,14 +37,12 @@ import moe.kcwiki.tools.constant;
  * @author VEP
  */
 public class Start2Analyzer {
-    private final String localpath;
     private boolean wfFlag; 
     private final String downloadserver;
     private final String[] typelist;            
 
     public Start2Analyzer() {
         this.typelist = new String[]{"ship","shipgraph","slotitem_equiptype","equip_exslot","stype","slotitem","furniture","furnituregraph","useitem","payitem","maparea","mapinfo","mapbgm","mapcell","mission","shipupgrade","bgm"};    //"item_shop"、"const" 字段无法被转换成JSONArray
-        this.localpath=MainServer.getLocalpath();
         this.wfFlag=false;
         this.downloadserver=MainServer.getKcwikiServerAddress();
     }
@@ -66,7 +64,7 @@ public class Start2Analyzer {
         try{
             JSONObject Data=JSON.parseObject(startdata);
             
-            try (BufferedWriter Obfr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(localpath+File.separator+"temp"+File.separator+"Start2_UTF8.json")), "UTF-8"))) {
+            try (BufferedWriter Obfr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+File.separator+"Start2_UTF8.json")), "UTF-8"))) {
                 Obfr.write(Data.toJSONString());
             }
             
@@ -814,7 +812,7 @@ public class Start2Analyzer {
         
         HashMap<String, Ship> ShipgraphDB = new LinkedHashMap<>();
         boolean ShipgraphDBFlag=false;
-        String ShipgraphstdDBFile=MainServer.getDataPath()+File.separator+"ShipgraphstdDB.txt";
+        String ShipgraphstdDBFile=MainServer.getDataFolder()+File.separator+"ShipgraphstdDB.txt";
         
         
         if(new File(ShipgraphstdDBFile).exists()){
@@ -988,7 +986,7 @@ public class Start2Analyzer {
     
     public boolean Export() throws FileNotFoundException, UnsupportedEncodingException, IOException{
     
-        String folder=MainServer.getWorksPath()+File.separator+"Start2_Export.txt";
+        String folder=MainServer.getWorksFolder()+File.separator+"Start2_Export.txt";
         wfFlag=false;
         String Data,nData;
         
