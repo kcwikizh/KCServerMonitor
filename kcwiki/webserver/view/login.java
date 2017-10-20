@@ -63,9 +63,13 @@ public class login extends HttpServlet{
         if( getUserList().get(username).equals(password)){
             session.setAttribute("hsaLogin", "true");
             data.put("status", "success");
-            data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html");
+            //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html");
             //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/admin.html");
-            //data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
+            if(request.getServerName().equals("127.0.0.1")){
+                data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
+            } else {
+                data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html");
+            }
             
         }else{
             data.put("status", "error");

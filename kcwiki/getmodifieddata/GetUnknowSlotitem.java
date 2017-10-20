@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import moe.kcwiki.getstart2data.Encoder;
 
 import moe.kcwiki.init.MainServer;
 import static moe.kcwiki.init.MainServer.isStopScanner;

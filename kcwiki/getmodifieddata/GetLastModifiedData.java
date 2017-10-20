@@ -41,7 +41,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import moe.kcwiki.database.DBCenter;
 import static moe.kcwiki.getmodifieddata.GetUnkownShip.unknowShipList;
-import moe.kcwiki.getstart2data.Encoder;
 import static moe.kcwiki.init.MainServer.isStopScanner;
 import moe.kcwiki.unpackswf.Server;
 import moe.kcwiki.massagehandler.msgPublish;

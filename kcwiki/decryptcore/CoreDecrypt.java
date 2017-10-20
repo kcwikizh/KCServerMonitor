@@ -8,7 +8,6 @@ package moe.kcwiki.decryptcore;
 import moe.kcwiki.init.MainServer;
 
 import moe.kcwiki.init.GetModifiedDataThread;
-import moe.kcwiki.getstart2data.Encoder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +31,7 @@ import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.threadpool.corePool;
 import static moe.kcwiki.threadpool.start2dataPool.getTaskNum;
+import moe.kcwiki.tools.Encoder;
 import moe.kcwiki.tools.constant;
 
 /**
@@ -124,7 +124,9 @@ public class CoreDecrypt {
                     msgPublish.msgPublisher("moe.kcwiki.decryptcore-CoreDecrypt-getData:IOException",0,-1);
                     Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
                     return taskID;
-                }
+                }   catch (Exception ex) {
+                        Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 msgPublish.msgPublisher("decryptCore\t子线程运行完毕",0,0);
                 GetModifiedDataThread.finishJob();
                 return taskID;

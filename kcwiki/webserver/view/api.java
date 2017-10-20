@@ -33,12 +33,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import moe.kcwiki.init.MainServer;
 import org.apache.commons.lang3.StringUtils;
+import moe.kcwiki.webserver.api.*;
 
 /**
  *
  * @author iTeam_VEP
  */
-public class download extends HttpServlet {
+public class api extends HttpServlet {
     private StringBuilder sb = null;
     public final static String LINESEPARATOR = System.getProperty("line.separator", "\n");
     
@@ -49,36 +50,32 @@ public class download extends HttpServlet {
             
     HashMap<String, Object> data = new  HashMap<>();
 
-        String parameter=request.getParameter("download");
+        String parameter = request.getParameter("query");
+        String user = request.getParameter("user");
+        String token = request.getParameter("token");
         //MainServer.setZipFolder(Long.parseLong("123411144"));
         Long date = MainServer.getZipFolder() ;
-        if(parameter == null || !parameter.equals("true")){
+        if(parameter == null ){
             data.put("status", "error");
             data.put("data", "请附带请求参数。");
         } else {
             sb = new StringBuilder();
-            if(date == null ) {
-                this.addString("<!DOCTYPE html><html><body>");
-                this.addString("文件队列仍未下载完毕，请等待后台下载进程执行。");
-                this.addString("</body></html>");
-            }else{
-                File[] fl = new File(MainServer.getPublishFolder()+File.separator+MainServer.getZipFolder()).listFiles();
-                String Publishing = "/KcWikiOnline/custom/Publishing/"+ date +"/";
-                this.addString("<!DOCTYPE html><html><body>");
-                for(File zip:fl) {
-                    String filename = zip.getName();
-                    String url = null;
-                    
-                    if(filename.contains("sourcefile"))
-                        url = "<a href=\""+Publishing+filename+"\" >" +"完整的拆包文件（包括差分音频），请配合kcre进行拆包工作。" +"</a>";
-                    if(filename.contains("editorialfile"))
-                        url = "<a href=\""+Publishing+filename+"\" >" +"内含lua、拆好的地图、舰娘&装备立绘。（娇喘更新了的话）"+"</a>";
-                    if(filename.contains("logfile"))
-                        url = "<a href=\""+Publishing+filename+"\">" +"日志文件，仅供技术组分析用。"+"</a>";
-                    url += LINESEPARATOR;
-                    this.addString(url);
-                }
-                this.addString("</body></html>");
+            switch(parameter){
+                default:
+                    data.put("status", "failure");
+                    data.put("data", "请求参数有误。");
+                    break;
+                case "download":
+                    sb.append(new download().getData());
+                    break;
+                case "monitor":
+                    sb.append(new monitor().getData());
+                    break; 
+                case "whatsnew":
+                    sb.append(new whatsnew().getData());
+                    break; 
+                case "admin":
+                    break; 
             }
 
         }
@@ -92,8 +89,8 @@ public class download extends HttpServlet {
         }
     } catch (Exception e) {
         e.printStackTrace();
-        Logger.getLogger(download.class.getName()).log(Level.SEVERE, null, e);
-        Logger.getLogger(download.class.getName()).log(Level.WARNING, "客户端异常关闭" , e);
+        Logger.getLogger(api.class.getName()).log(Level.SEVERE, null, e);
+        Logger.getLogger(api.class.getName()).log(Level.WARNING, "客户端异常关闭" , e);
     }
   }
 

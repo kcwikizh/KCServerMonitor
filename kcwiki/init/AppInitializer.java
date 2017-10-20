@@ -5,6 +5,7 @@
  */
 package moe.kcwiki.init;
 
+import java.util.Date;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import moe.kcwiki.threadpool.Controller;
@@ -21,6 +22,7 @@ public class AppInitializer implements ServletContextListener {
         MainServer.init(true); 
         CatchError.init();
         Controller.ininPool();
+        MainServer.setInitDate(new Date().getTime());
     }
 
     @Override

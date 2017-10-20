@@ -30,6 +30,7 @@ import moe.kcwiki.database.*;
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.massagehandler.msgPublish;
+import moe.kcwiki.tools.Encoder;
 import moe.kcwiki.tools.constant;
 
 /**

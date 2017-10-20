@@ -69,6 +69,7 @@ public class MainServer {
     private static String museumFolder;
     private static Proxy httpproxy = null;
     private static Long zipFolder = null;
+    private static Long initDate = null;
     
     private static HashMap<String, String> FileList = new HashMap<>();  
     
@@ -477,5 +478,19 @@ public class MainServer {
      */
     public static void setZipFolder(Long aZipFolder) {
         zipFolder = aZipFolder;
+    }
+
+    /**
+     * @return the initDate
+     */
+    public static Long getInitDate() {
+        return initDate;
+    }
+
+    /**
+     * @param aInitDate the initDate to set
+     */
+    public static void setInitDate(Long aInitDate) {
+        initDate = aInitDate;
     }
 }

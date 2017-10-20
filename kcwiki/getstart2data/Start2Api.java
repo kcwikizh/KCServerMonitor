@@ -17,6 +17,8 @@ import java.net.Proxy;
 import java.net.URL;
 import static java.lang.Thread.sleep;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import javax.swing.JOptionPane;
 import moe.kcwiki.init.MainServer;
@@ -33,24 +35,30 @@ public class Start2Api {
     private HttpURLConnection conn = null; 
     private String Start2Json;  
     
-    public String GetStart2Api(String url) throws InterruptedException, IOException, Exception {  
-        HttpURLConnection conn1;  
-        InputStream in;  
-        this.urlStr=url;
-        
-        byte[] buf = new byte[1024];  
-        
-        if((conn1 = this.GetHttpURLConnection())!=null){
-            in = conn1.getInputStream();
-            String str = "";  
-            while (in.read(buf) != -1) {
-                str = new String(buf);
-                //System.out.print(str); 
+    public String GetStart2Api(String url)  {  
+        try {
+            HttpURLConnection conn1;
+            InputStream in;
+            this.urlStr=url;
+            
+            byte[] buf = new byte[1024];
+            
+            if((conn1 = this.GetHttpURLConnection())!=null){
+                in = conn1.getInputStream();
+                String str = "";
+                while (in.read(buf) != -1) {
+                    str = new String(buf);
+                    //System.out.print(str);
+                }
+                conn1.disconnect();
+                conn.disconnect();
+                return Start2Json;
             }
-            sleep(3*1000);
-            conn1.disconnect();
-            conn.disconnect();
-            return Start2Json;
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(Start2Api.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Start2Api.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }  

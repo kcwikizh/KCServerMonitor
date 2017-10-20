@@ -39,7 +39,6 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import moe.kcwiki.getstart2data.Encoder;
 
 import moe.kcwiki.init.MainServer;
 import static moe.kcwiki.init.MainServer.isStopScanner;
@@ -49,6 +48,7 @@ import moe.kcwiki.massagehandler.msgPublish;
 import static moe.kcwiki.threadpool.getUnkownShipPool.*;
 import moe.kcwiki.tools.GetHash;
 import moe.kcwiki.tools.constant;
+import moe.kcwiki.tools.Encoder;
 
 /**
  *
