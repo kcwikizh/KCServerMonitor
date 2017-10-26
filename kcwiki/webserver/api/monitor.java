@@ -166,6 +166,7 @@ public class monitor {
           this.addString("getUrlList: "+JSON.toJSONString(json));
         });
       this.addString("getUrlprePublishList: "+msgPublish.getUrlprePublishListSize());
+      
       if(CoreDecrypt.shipAddressList != null){
           CoreDecrypt.shipAddressList.keySet().forEach((_item) -> {
           this.addString("shipVioceAddressList: "+JSON.toJSONString(_item));

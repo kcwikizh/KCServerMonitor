@@ -87,7 +87,7 @@ public class MainServer {
             }
             int lastIndex = path.lastIndexOf("/WEB-INF/classes/") ;
             if(lastIndex == -1) {
-                webrootPath = path.substring(0, path.length()-1);
+                webrootPath = path.substring(0, path.length() -1);
             } else {
                 webrootPath = path.substring(0, lastIndex);
             }

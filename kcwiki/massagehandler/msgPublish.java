@@ -87,7 +87,7 @@ public class msgPublish {
     
     public static boolean urlPublisher(String path,String name){
         LinkedHashMap objMap = new LinkedHashMap<>();
-        String url = path.substring(MainServer.getWebrootPath().length()+1, path.length());
+        String url = "/Publishing" + path.substring(MainServer.getPublishFolder().length(), path.length());
         objMap.put("name", name);
         objMap.put("src", url);
         getUrlList().add(objMap.clone());
@@ -106,7 +106,7 @@ public class msgPublish {
         //msgPublish.msgPublisher("fileList.length"+fileList.length,0,1);
         if(fileList!=null){
             for (File file : fileList) {
-                url = file.getAbsolutePath().substring(MainServer.getWebrootPath().length()+1, file.getAbsolutePath().length());
+                url = "/Publishing" + file.getAbsolutePath().substring(MainServer.getPublishFolder().length(), file.getAbsolutePath().length());
                 objMap.put("name", name);
                 objMap.put("src", url);
                 getUrlList().add(objMap.clone());
@@ -130,17 +130,18 @@ public class msgPublish {
         //msgPublish.msgPublisher("fileList.length"+fileList.length,0,1);
         if(fileList!=null){
             String folderName = new File(folder).getName();
+            String publishFolder = "/Publishing" + folder.substring(MainServer.getPublishFolder().length(),folder.length());
             if(fileList.length == 2){
                 for(String file:enemy){
                     objMap.put("name", folderName);
-                    objMap.put("src", folder+FILESEPARATOR+file);
+                    objMap.put("src", publishFolder+FILESEPARATOR+file);
                     getUrlList().add(objMap.clone());
                     objMap.clear();
                 }
             } else {
                 for(String file:files){
                     objMap.put("name", folderName);
-                    objMap.put("src", folder+FILESEPARATOR+file);
+                    objMap.put("src", publishFolder+FILESEPARATOR+file);
                     getUrlList().add(objMap.clone());
                     objMap.clear();
                 }
@@ -171,7 +172,7 @@ public class msgPublish {
                     if(frames.exists()){
                             String mapPath = frames.getAbsolutePath()+FILESEPARATOR+"2.png";
                             if(new File(mapPath).exists()){
-                                url = mapPath.substring(MainServer.getWebrootPath().length()+1,mapPath.length());
+                                url = "/Publishing" + mapPath.substring(MainServer.getPublishFolder().length(),mapPath.length());
                                 objMap.put("name", mapfolder.getName());
                                 objMap.put("src", url);
                                 getUrlList().add(objMap.clone());
@@ -192,7 +193,7 @@ public class msgPublish {
     
     public static boolean urlPrePublisher(String path,String name){
         LinkedHashMap objMap = new LinkedHashMap<>();
-        String url = path.substring(MainServer.getWebrootPath().length()+1, path.length());
+        String url = "/Publishing"+path.substring(MainServer.getPublishFolder().length(), path.length());
         objMap.put("name", name);
         objMap.put("src", url);
         getUrlprePublishList().add(objMap.clone());
@@ -227,7 +228,7 @@ public class msgPublish {
                     }
                 }
                 */
-                url = ship.getAbsolutePath().substring(MainServer.getWebrootPath().length()+1, ship.getAbsolutePath().length());
+                url = "/Publishing" + ship.getAbsolutePath().substring(MainServer.getPublishFolder().length(), ship.getAbsolutePath().length());
                 objMap.put("name", ship.getName());
                 objMap.put("src", url);
                 getUrlprePublishList().add(objMap.clone());

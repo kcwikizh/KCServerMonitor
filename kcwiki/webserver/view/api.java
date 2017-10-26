@@ -76,6 +76,8 @@ public class api extends HttpServlet {
                     break; 
                 case "admin":
                     break; 
+                case "null":
+                    sb.append(request.getScheme()).append("://").append(request.getServerName()).append(":").append(request.getServerPort());
             }
 
         }
