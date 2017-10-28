@@ -5,20 +5,35 @@
  */
 package moe.kcwiki.init;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import moe.kcwiki.tools.GetPresetData;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import static java.lang.Thread.sleep;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.Proxy;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.dtools.ini.*; 
@@ -27,11 +42,14 @@ import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
 import javax.servlet.ServletException;  
 import javax.servlet.http.HttpServlet; 
+import moe.kcwiki.getstart2data.GetStart2;
+import moe.kcwiki.getstart2data.HttpUtil;
 import moe.kcwiki.threadpool.Controller;
 import moe.kcwiki.tools.CatchError;
 import static moe.kcwiki.webserver.view.login.setUserList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
 
 /**
  *
@@ -40,6 +58,20 @@ import org.apache.commons.lang3.StringUtils;
 
 //http://www.cnblogs.com/younggun/archive/2013/12/12/3470821.html
 public class MainServer {
+
+    /**
+     * @param aLocaloldstart2 the localoldstart2 to set
+     */
+    public static void setLocaloldstart2(String aLocaloldstart2) {
+        localoldstart2 = aLocaloldstart2;
+    }
+
+    /**
+     * @param aTempFolder the tempFolder to set
+     */
+    public static void setTempFolder(String aTempFolder) {
+        tempFolder = aTempFolder;
+    }
 
     private static boolean useproxy; 
     private static String proxyhost;
@@ -70,6 +102,8 @@ public class MainServer {
     private static Proxy httpproxy = null;
     private static Long zipFolder = null;
     private static Long initDate = null;
+    private static HashMap<String,String> worldMap = new LinkedHashMap<>();
+    private static List<String> worldList = new ArrayList<>();
     
     private static HashMap<String, String> FileList = new HashMap<>();  
     
@@ -97,7 +131,7 @@ public class MainServer {
             MainServer.worksFolder = publicPath + FILESEPARATOR + "works";
             MainServer.dataFolder = privatePath + FILESEPARATOR + "data";
             MainServer.logFolder = privatePath + FILESEPARATOR + "log";
-            MainServer.tempFolder = privatePath+ FILESEPARATOR + "temp"; 
+            MainServer.setTempFolder(privatePath+ FILESEPARATOR + "temp"); 
             MainServer.downloadFolder = privatePath+ FILESEPARATOR + "download"; 
             MainServer.previousFolder = privatePath+ FILESEPARATOR + "previousswf"; 
             MainServer.museumFolder = privatePath+ FILESEPARATOR + "previouszip"; 
@@ -109,7 +143,7 @@ public class MainServer {
                 init = false;
             }
             //readseason();
-            
+            getWorldlist();
             return true;
         } catch (UnsupportedEncodingException ex) {
             msgPublish.msgPublisher("UnsupportedEncodingException occurred \t Initialization Failed",0,-1); 
@@ -136,7 +170,7 @@ public class MainServer {
             }
             
             MainServer.DebugMode = iniSection.getItem("debugMode").getValue().equals("1");
-            MainServer.localoldstart2 = MainServer.dataFolder + File.separator + iniSection.getItem("localOldstart2").getValue();
+            MainServer.setLocaloldstart2(MainServer.dataFolder + File.separator + iniSection.getItem("localOldstart2").getValue());
             MainServer.kcwikiServerAddress = iniSection.getItem("kcwikiServerAddress").getValue(); 
             if(isDebugMode()){
                 MainServer.dmmServerAddress = MainServer.getKcwikiServerAddress();
@@ -188,12 +222,18 @@ public class MainServer {
             
             iniSection = iniFile.getSection("ShipVoice");
             for(IniItem item:iniSection){
-                moe.kcwiki.unpackswf.Server.shipvoicerule.put(item.getName(), item.getValue());
+                if(item.getValue() == null || StringUtils.isBlank(item.getValue()) )
+                    moe.kcwiki.unpackswf.Server.shipvoicerule.put(item.getName(), "");
+                else
+                    moe.kcwiki.unpackswf.Server.shipvoicerule.put(item.getName(), item.getValue());
             }
             
             iniSection = iniFile.getSection("SlotItem");
             for(IniItem item:iniSection){
-                moe.kcwiki.unpackswf.Server.slotitemrule.put(item.getName(), item.getValue());
+                if(item.getValue() == null || StringUtils.isBlank(item.getValue()) )
+                    moe.kcwiki.unpackswf.Server.slotitemrule.put(item.getName(), "");
+                else
+                    moe.kcwiki.unpackswf.Server.slotitemrule.put(item.getName(), item.getValue());
             }
             
             iniSection = iniFile.getSection("userList");
@@ -239,6 +279,101 @@ public class MainServer {
         } catch (IOException ex) {
             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static boolean getWorldlist() {
+        
+        HttpURLConnection conn = null;
+        try {  
+            String formatCode;
+            while(true){
+                URL url = new URL("https://api.kcwiki.moe/servers");  
+                
+                conn = (HttpURLConnection) url.openConnection();  
+                conn.setDoOutput(true); 
+                conn.setRequestMethod("GET");  
+                conn.setRequestProperty("Host", url.getHost()); 
+                conn.setRequestProperty("connection", "keep-alive");  
+                conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
+                conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
+                conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"); 
+                conn.setRequestProperty("DNT", "1");       
+                conn.setRequestProperty("Accept-Encoding", "gzip, deflate");  
+                conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");      
+
+                try{
+                    conn.connect();
+                }catch(UnknownHostException e){
+                    return false;
+                }catch(IOException e){
+                    return false;
+                }
+                
+                
+                // normally, 3xx is redirect
+                boolean redirect = false;
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                        || responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                            || responseCode == HttpURLConnection.HTTP_SEE_OTHER)
+                    redirect = true;
+                }
+
+
+                if (redirect) {
+                    // get redirect url from "location" header field
+                    String newUrl = conn.getHeaderField("Location");
+                    // get the cookie if need, for login
+                    String cookies = conn.getHeaderField("Set-Cookie");
+                    // open the new connnection again
+                    conn = (HttpURLConnection) new URL(newUrl).openConnection();
+                    conn.setRequestProperty("Cookie", cookies);
+                    conn.setRequestProperty("connection", "keep-alive");  
+                    conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
+                    conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
+                    conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"); 
+                    conn.setRequestProperty("DNT", "1");       
+                    conn.setRequestProperty("Accept-Encoding", "gzip, deflate");  
+                    conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8"); 
+                }
+                conn.connect();
+                responseCode = conn.getResponseCode();  
+                if (responseCode <= 300) {  
+                    formatCode=conn.getContentEncoding();
+                    break;
+                }else{
+                    return false;
+                }
+            }
+            BufferedReader reader;
+            if(formatCode!=null){
+                reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(conn.getInputStream()), "UTF-8"));
+            }else{
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+            }
+            
+            String str = "";
+            String line;
+            while ((line = reader.readLine()) != null){
+                str+=line;       
+            }
+            JSONArray worlds = JSON.parseArray(str);
+            for(Object item:worlds) {
+                JSONObject world = (JSONObject) item;
+                getWorldMap().put(world.getString("id"), world.getString("ip"));
+                getWorldList().add(world.getString("ip"));
+            }
+            
+        } catch (MalformedURLException e) {  
+            return false;
+        } catch (ProtocolException e) {  
+            return false;
+        } catch (IOException e) {  
+            return false;
+        }  
+        
+        return true; 
     }
 
 
@@ -492,5 +627,19 @@ public class MainServer {
      */
     public static void setInitDate(Long aInitDate) {
         initDate = aInitDate;
+    }
+
+    /**
+     * @return the worldMap
+     */
+    public static HashMap<String,String> getWorldMap() {
+        return worldMap;
+    }
+
+    /**
+     * @return the worldList
+     */
+    public static List<String> getWorldList() {
+        return worldList;
     }
 }

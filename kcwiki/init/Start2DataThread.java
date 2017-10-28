@@ -42,6 +42,7 @@ public class Start2DataThread {
                     if(MainServer.isDebugMode()){
                         new moe.kcwiki.getstart2data.Start2Analyzer().ReadNewFile(null);
                     }else if(!new moe.kcwiki.getstart2data.GetStart2().netStart()){
+                        msgPublish.msgPublisher("netStart运行出错，已停止GetStart2\t子线程运行。",0,1);
                         return;
                     }
                         msgPublish.msgPublisher("hasStart2:"+hasStart2,0,0);

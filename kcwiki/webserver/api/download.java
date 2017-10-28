@@ -15,6 +15,7 @@ import static moe.kcwiki.tools.constant.LINESEPARATOR;
  */
 public class download {
     private StringBuilder sb = null;
+    private static String urlprefix = "/custom/Publishing/";
     
     public String getData() {
         sb = new StringBuilder();
@@ -26,7 +27,7 @@ public class download {
         }else{
                 File[] fl = new File(MainServer.getPublishFolder()+File.separator+MainServer.getZipFolder()).listFiles();
                 //String Publishing = "/KcWikiOnline/custom/Publishing/"+ date +"/";
-                String Publishing = "/Publishing/"+ date +"/";
+                String Publishing = urlprefix + date +"/";
                 this.addString("<!DOCTYPE html><html><body>");
                 for(File zip:fl) {
                     String filename = zip.getName();

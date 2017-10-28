@@ -34,7 +34,6 @@ public class CatchError {
     private static final AtomicInteger count = new AtomicInteger(1);
     
     public static boolean init(){
-        if(init){return false;}
         /*
         String path = System.getProperty("java.class.path");
         int firstIndex = path.lastIndexOf(System.getProperty("path.separator")) + 1;
@@ -42,13 +41,13 @@ public class CatchError {
         String realPath = path.substring(firstIndex, lastIndex);
         String localpath = java.net.URLDecoder.decode(realPath, "utf-8");
         */
+        if(init){return false;}
         
         String logpath = MainServer.getLogFolder();
         try {
             time = new Date();
             new File(logpath).mkdirs();
             pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(logpath+File.separator+dateFormat.format( time )+".txt")), "UTF-8"), true) ;
-            time = new Date();
             pw.write(constant.LINESEPARATOR+constant.LINESEPARATOR+dateFormat.format( time )+constant.LINESEPARATOR+"开始运行"+constant.LINESEPARATOR);
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(CatchError.class.getName()).log(Level.SEVERE, null, ex);

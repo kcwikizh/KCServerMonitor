@@ -74,6 +74,9 @@ public class api extends HttpServlet {
                 case "whatsnew":
                     sb.append(new whatsnew().getData());
                     break; 
+                case "jsonpatch":
+                    sb.append(new jsonpatch().getData());
+                    break; 
                 case "admin":
                     break; 
                 case "null":

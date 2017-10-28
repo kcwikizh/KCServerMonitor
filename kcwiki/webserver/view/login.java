@@ -65,10 +65,13 @@ public class login extends HttpServlet{
             data.put("status", "success");
             //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html");
             //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/admin.html");
-            if(request.getServerName().equals("127.0.0.1")){
+            String host = request.getServerName();
+            if(host.equals("127.0.0.1")){
                 data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
-            } else {
-                data.put("info", request.getScheme()+"://"+request.getServerName()+"/admin.html");
+            } else if (host.contains("kcwiki")){
+                data.put("info", request.getScheme()+"://"+request.getServerName()+"/admin.html"); 
+            } else if (host.contains("45.")) {
+                data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html"); 
             }
             //data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
             

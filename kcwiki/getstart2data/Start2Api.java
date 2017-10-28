@@ -81,8 +81,8 @@ public class Start2Api {
                 
                 conn = (HttpURLConnection) url.openConnection();  
                 conn.setDoOutput(true); 
-                conn.setRequestMethod("GET");  
-                conn.setRequestProperty("Host", "acc.kcwiki.org");  
+                conn.setRequestMethod("GET"); 
+                conn.setRequestProperty("Host", url.getHost()); 
                 conn.setRequestProperty("connection", "keep-alive");  
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
                 conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
@@ -99,8 +99,36 @@ public class Start2Api {
                     return null;
                 }
                 
+                // normally, 3xx is redirect
+                boolean redirect = false;
+                int responseCode = conn.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                        || responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                            || responseCode == HttpURLConnection.HTTP_SEE_OTHER)
+                    redirect = true;
+                }
+
+
+                if (redirect) {
+                    // get redirect url from "location" header field
+                    String newUrl = conn.getHeaderField("Location");
+                    // get the cookie if need, for login
+                    String cookies = conn.getHeaderField("Set-Cookie");
+                    // open the new connnection again
+                    conn = (HttpURLConnection) new URL(newUrl).openConnection();
+                    conn.setRequestProperty("Cookie", cookies);
+                    conn.setRequestProperty("connection", "keep-alive");  
+                    conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
+                    conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
+                    conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"); 
+                    conn.setRequestProperty("DNT", "1");       
+                    conn.setRequestProperty("Accept-Encoding", "gzip, deflate");  
+                    conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8"); 
+                }
+                conn.connect();
                 
-                int responseCode = conn.getResponseCode();  
+                responseCode = conn.getResponseCode();  
                 if (responseCode <= 300) {  
                     formatCode=conn.getContentEncoding();
                     break;

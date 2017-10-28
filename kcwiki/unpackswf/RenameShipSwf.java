@@ -26,6 +26,7 @@ import moe.kcwiki.threadpool.start2dataPool;
 import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -47,13 +48,21 @@ public class RenameShipSwf {
                 if(!DBCenter.NewShipDB.isEmpty()){
                     //for( Map.Entry<String,Ship> map : DBCenter.NewShipDB.entrySet()){
                     DBCenter.NewShipDB.entrySet().forEach((map) -> {
-                        ShipList.put(map.getKey(), map.getValue());
+                        Ship ship = map.getValue();
+                        if(ship.getApi_sortno() == null || StringUtils.isBlank(ship.getApi_sortno()))
+                            ShipList.put(DBCenter.beforeShipSortNO.get(map.getKey()) + "a", ship);
+                        else
+                            ShipList.put(ship.getApi_sortno(), ship);
                     });
                 }
                 if(!DBCenter.SuspectShipData.isEmpty()){
                     //for( Map.Entry<String,String> map : DBCenter.SuspectShipData.entrySet()){
                     DBCenter.SuspectShipData.entrySet().forEach((map) -> {
-                        ShipList.put(map.getKey(), DBCenter.ShipDB.get(map.getKey()));
+                        Ship ship = DBCenter.ShipDB.get(map.getKey());
+                        if(ship.getApi_sortno() == null || StringUtils.isBlank(ship.getApi_sortno()))
+                            ShipList.put(DBCenter.beforeShipSortNO.get(map.getKey()) + "a", ship);
+                        else
+                            ShipList.put(map.getKey(), ship);
                     });
                 }
                 

@@ -6,6 +6,7 @@
 package moe.kcwiki.getstart2data;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.parser.Feature;
@@ -94,7 +95,7 @@ public class Start2List {
                 conn = (HttpURLConnection) url.openConnection();  
                 conn.setDoOutput(true); 
                 conn.setRequestMethod("GET");  
-                conn.setRequestProperty("Host", "acc.kcwiki.org");  
+                conn.setRequestProperty("Host", url.getHost());  
                 conn.setRequestProperty("connection", "keep-alive");  
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1"); 
                 conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
@@ -243,6 +244,8 @@ public class Start2List {
                         JsonNode afterNode = jackson.readTree(str2); 
                         JsonNode patchNode = JsonDiff.asJson(beforeNode, afterNode); 
                         String diff = patchNode.toString();
+                        JSONArray jarr = JSON.parseArray(diff);
+                        
                         /*if(diff.equals("[]")){
                             System.out.println(src1+"\t equals: "+src2);
                         } else {
@@ -256,6 +259,10 @@ public class Start2List {
                             System.out.println(src1+"\t equals: "+src2);
                             sameMap.put(src1, src2);
                         } else {
+                            for(Object key:jarr) {
+                                JSONObject obj = (JSONObject) key;
+                                System.out.println(src1+"\t not equals: "+src2);
+                            }
                             System.out.println(src1+"\t not equals: "+src2);
                             diffMap.put(src1, src2);
                         } 

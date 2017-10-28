@@ -193,10 +193,11 @@ public class DLThread {
                                 //msgPublish.msgPublisher("useitem:"+opPath,0,0);
                                 msgPublish.urlPrePublisher(opPath, fileName);
                             }
-                            if(! new File(MainServer.getWorksFolder()+File.separator+filePath).exists()){
-                                new File(MainServer.getWorksFolder()+File.separator+filePath).mkdirs();
+                            String relativePath = filePath.substring(rootFolder.length()+1, filePath.length());
+                            if(! new File(MainServer.getWorksFolder()+File.separator+relativePath).exists()){
+                                new File(MainServer.getWorksFolder()+File.separator+relativePath).mkdirs();
                             }
-                            FileUtils.copyFileToDirectory(new File(opPath), new File(MainServer.getWorksFolder()+File.separator+filePath));
+                            FileUtils.copyFileToDirectory(new File(opPath), new File(MainServer.getWorksFolder()+File.separator+relativePath));
                         }
                         //moe.kcwiki.massagehandler.MainGui.jProgressBar1.setValue(value); 
                     }

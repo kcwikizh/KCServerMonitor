@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;  
 import java.util.logging.Level;  
 import java.util.logging.Logger;  
+import moe.kcwiki.init.MainServer;
+import static moe.kcwiki.tools.constant.FILESEPARATOR;
     
 public class loggerManager {    
     
@@ -22,16 +24,17 @@ public class loggerManager {
     //http://blog.csdn.net/zhao1949/article/details/52787927
     
     private static Map<Class<?>,Logger> loggerCache = new HashMap<Class<?>,Logger>();  
+
     // 初始化LogManager    
     static {    
         // 读取配置文件    
         ClassLoader cl = loggerManager.class.getClassLoader();    
         InputStream inputStream = null;    
         if (cl != null) {    
-            inputStream = cl.getResourceAsStream("log.properties");    
+            inputStream = cl.getResourceAsStream(MainServer.getDataFolder() + FILESEPARATOR + "log.properties");    
         } else {    
             inputStream = ClassLoader    
-                    .getSystemResourceAsStream("log.properties");    
+                    .getSystemResourceAsStream(MainServer.getDataFolder() + FILESEPARATOR + "log.properties");    
         }    
         java.util.logging.LogManager logManager = java.util.logging.LogManager    
                 .getLogManager();    
@@ -51,7 +54,7 @@ public class loggerManager {
                 ex.printStackTrace();  
             }  
         }  
-    }    
+    }   
     
     /**  
      * 获取日志对象  

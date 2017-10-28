@@ -29,6 +29,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -56,8 +57,9 @@ public class GetUnknowSlotitem {
     public static LinkedHashMap<String, String> unknowShipList = new LinkedHashMap<>(); 
     private final java.util.ArrayList<String>  dataList;
     private final String rootFolder = MainServer.getTempFolder() + File.separator+"newSlotItem";
-    String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
-    String[] serverlistname=new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
+    //String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
+    private static List<String> serverlistaddress = MainServer.getWorldList();
+    private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
         
     public GetUnknowSlotitem(){
         this.proxyhost = moe.kcwiki.init.MainServer.getProxyhost();
@@ -195,10 +197,10 @@ public class GetUnknowSlotitem {
     }
     
     private void serverAddress(){
-        serveraddress=serverlistaddress[servernum];
-        servername=serverlistname[servernum]+"-"+serverlistaddress[servernum];
+        serveraddress=serverlistaddress.get(servernum);
+        servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
         servernum++;
-        if(servernum==serverlistaddress.length){
+        if(servernum==serverlistaddress.size()){
             servernum=0;
         }
     }

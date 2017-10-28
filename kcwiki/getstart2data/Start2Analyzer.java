@@ -10,6 +10,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flipkart.zjsonpatch.JsonDiff;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,12 +28,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import moe.kcwiki.database.*;
 
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.massagehandler.msgPublish;
+import moe.kcwiki.tools.CatchError;
 import moe.kcwiki.tools.Encoder;
+import moe.kcwiki.tools.RWFile;
 import moe.kcwiki.tools.constant;
 
 /**
@@ -40,7 +47,9 @@ import moe.kcwiki.tools.constant;
 public class Start2Analyzer {
     private boolean wfFlag; 
     private final String downloadserver;
-    private final String[] typelist;            
+    private final String[] typelist;   
+    private static String newstart2 = null;
+    private static String oldstart2 = null;
 
     public Start2Analyzer() {
         this.typelist = new String[]{"ship","shipgraph","slotitem_equiptype","equip_exslot","stype","slotitem","furniture","furnituregraph","useitem","payitem","maparea","mapinfo","mapbgm","mapcell","mission","shipupgrade","bgm"};    //"item_shop"、"const" 字段无法被转换成JSONArray
@@ -48,7 +57,7 @@ public class Start2Analyzer {
         this.downloadserver=MainServer.getKcwikiServerAddress();
     }
         
-    public boolean ReadNewFile(StringBuilder buffer) throws IOException, Exception{
+    public boolean ReadNewFile(StringBuilder buffer) {
         String startdata;
         if(buffer == null){
             startdata=new Start2Api().GetStart2Api(MainServer.getNewstart2());
@@ -60,13 +69,19 @@ public class Start2Analyzer {
             }
         }
         
-        
         String  prefix="api_mst_";
         try{
             JSONObject Data=JSON.parseObject(startdata);
+            newstart2 = JSON.toJSONString(Data);
             
             try (BufferedWriter Obfr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+File.separator+"Start2_UTF8.json")), "UTF-8"))) {
                 Obfr.write(Data.toJSONString());
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             Map<String,JSONObject> tempMap=new LinkedHashMap<>();
@@ -113,6 +128,9 @@ public class Start2Analyzer {
                             newone.setApi_fuel_max(newObject.getString("api_fuel_max"));
                             newone.setApi_bull_max(newObject.getString("api_bull_max"));
                             newone.setApi_voicef(newObject.getString("api_voicef"));
+                            if(newObject.getString("api_aftershipid")!=null && !newObject.getString("api_aftershipid").equals("0")){
+                                DBCenter.beforeShipSortNO.put(newObject.getString("api_aftershipid"), newObject.getString("api_sortno"));
+                            }
                         }
                         return newone;
                     }).forEachOrdered((newone) -> {
@@ -428,12 +446,12 @@ public class Start2Analyzer {
         return true;
     }
 
-    private boolean ReadOldFile() throws IOException, Exception{
+    private boolean ReadOldFile() {
         
         StringBuilder buffer;
-        String startdata;
+        String startdata = null;
         if(MainServer.isDebugMode()){
-            //startdata = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/prev");
+            //startdata = new Start2Api().GetStart2Api("https://acc.kcwiki.org/start2/2017101821");
             startdata=new Start2Api().GetStart2Api(MainServer.getOldstart2());
         }else{
             try (BufferedReader nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(moe.kcwiki.init.MainServer.getLocaloldstart2data()), Encoder.codeString(moe.kcwiki.init.MainServer.getLocaloldstart2data())))) {
@@ -443,12 +461,17 @@ public class Start2Analyzer {
                     buffer.append(line);
                 }
                 startdata = buffer.toString();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
         String  prefix="api_mst_";
         try{
             JSONObject Data=JSON.parseObject(startdata);
+            oldstart2 = JSON.toJSONString(Data);
             Map<String,JSONObject> tempMap=new LinkedHashMap<>();
 
             for (String type:typelist){
@@ -809,7 +832,7 @@ public class Start2Analyzer {
         return true;
     }
     
-    private boolean StartContrast() throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception{    
+    private boolean StartContrast() {    
         
         HashMap<String, Ship> ShipgraphDB = new LinkedHashMap<>();
         boolean ShipgraphDBFlag=false;
@@ -817,23 +840,30 @@ public class Start2Analyzer {
         
         
         if(new File(ShipgraphstdDBFile).exists()){
-            BufferedReader nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(ShipgraphstdDBFile), Encoder.codeString(ShipgraphstdDBFile)));
-            String s;
-            while((s=nBfr.readLine())!=null){
-                Ship newShip=new Ship();
-                String[] str=s.split("\t");
-                if(str.length==7){
-                    newShip.setApi_id(str[0]);
-                    newShip.setApi_name(str[1]);
-                    newShip.setApi_filename(str[2]);
-                    newShip.setApi_version(str[3]);
-                    newShip.setApi_boko_n(str[4]);
-                    newShip.setApi_battle_n(str[5]);
-                    newShip.setApi_weda(str[6]);
-                    ShipgraphDB.put(str[0], newShip);
+            BufferedReader nBfr = null;
+            try {
+                nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(ShipgraphstdDBFile), Encoder.codeString(ShipgraphstdDBFile)));
+                String s;
+                while((s=nBfr.readLine())!=null){
+                    Ship newShip=new Ship();
+                    String[] str=s.split("\t");
+                    if(str.length==7){
+                        newShip.setApi_id(str[0]);
+                        newShip.setApi_name(str[1]);
+                        newShip.setApi_filename(str[2]);
+                        newShip.setApi_version(str[3]);
+                        newShip.setApi_boko_n(str[4]);
+                        newShip.setApi_battle_n(str[5]);
+                        newShip.setApi_weda(str[6]);
+                        ShipgraphDB.put(str[0], newShip);
+                    }
                 }
+                ShipgraphDBFlag=true;
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ShipgraphDBFlag=true;
         }
         
         for(String key : DBCenter.ShipDB.keySet()){      //Ship  
@@ -985,9 +1015,10 @@ public class Start2Analyzer {
         return true;
     }
     
-    public boolean Export() throws FileNotFoundException, UnsupportedEncodingException, IOException{
+    public boolean Export() {
     
         String folder=MainServer.getWorksFolder()+File.separator+"Start2_Export.txt";
+        //String folder="L:\\NetBeans\\NetBeansProjects\\KcWikiOnline\\tmp\\Start2_Export.txt";
         wfFlag=false;
         String Data,nData;
         
@@ -1301,6 +1332,12 @@ public class Start2Analyzer {
                 }              
             }
             eBfw.write(constant.LINESEPARATOR+constant.LINESEPARATOR+constant.LINESEPARATOR);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         if(wfFlag){
@@ -1308,7 +1345,55 @@ public class Start2Analyzer {
         }else{
             msgPublish.msgPublisher("Start2内没有发现任何新文件。",0,0);
         }
+        //jsonPatch();
         return true;
     }
     
+    private boolean jsonPatch() {
+        if(newstart2 == null || oldstart2 == null){
+            return false;
+        }  
+        HashMap<String, JSONObject> JsonPatch1 = new LinkedHashMap<>();  
+        HashMap<String, JSONObject> JsonPatch2 = new LinkedHashMap<>();  
+        try {
+            ObjectMapper jackson = new ObjectMapper();
+            JsonNode oldNode = jackson.readTree(oldstart2);
+            JsonNode newNode = jackson.readTree(newstart2);
+            JsonNode patchNode = JsonDiff.asJson(oldNode, newNode);
+            JSONArray jarr = JSON.parseArray(patchNode.toString());
+            /*for(JsonNode jn:patchNode){
+                JSONObject obj =  JSON.parseObject(jn.toString());
+                if(jn.has("path")){
+                    //DBCenter.JsonPatch.put(jn.get("path").asText(), obj);
+                    JsonPatch1.put(jn.get("path").asText(), obj);
+                }
+            }*/
+            if(patchNode.size() != 0) {
+                for(int i = 0; i<jarr.size(); i++){
+                    JSONObject obj =  jarr.getJSONObject(i);
+                    if(obj.containsKey("path")){
+                        DBCenter.JsonPatch.put(obj.getString("path"), obj);
+                    }
+                }
+            }
+            /*oldNode = jackson.readTree(JSON.toJSONString(JsonPatch1));
+            newNode = jackson.readTree(JSON.toJSONString(JsonPatch2));
+            patchNode = JsonDiff.asJson(oldNode, newNode);
+            if(JsonPatch1.equals(JsonPatch2))*/
+                
+            return true;
+        } catch (IOException ex) {
+            CatchError.WriteError("Start2Analyzer-jsonPatch-IOException");
+            Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    
+    public static void main(String[] args){
+        MainServer.setLocaloldstart2("L:\\NetBeans\\NetBeansProjects\\KcWikiOnline\\tmp\\tmp.json");
+        MainServer.setTempFolder("L:\\NetBeans\\NetBeansProjects\\KcWikiOnline\\tmp");
+        Start2Analyzer analyzer = new Start2Analyzer();
+        analyzer.ReadNewFile(null);
+    }
 }

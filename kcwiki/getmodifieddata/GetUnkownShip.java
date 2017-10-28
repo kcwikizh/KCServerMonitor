@@ -67,6 +67,8 @@ public class GetUnkownShip {
     private final static Set<String> md5DataSet = new HashSet<>();
     private final static List<JSONObject> md5DataList = new ArrayList<>();
     //private final static LinkedHashMap<String,JSONObject> md5DataMap = new LinkedHashMap<>();
+    private static List<String> serverlistaddress = MainServer.getWorldList();
+    private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
     private GetHash Hash = new GetHash();
     private final String rootFolder = MainServer.getTempFolder()+File.separator+"newShip";
     //private final java.util.ArrayList<String>  dataList;
@@ -451,12 +453,10 @@ public class GetUnkownShip {
     }
     
     private static void serverAddress(){
-        String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
-        String[] serverlistname=new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
-        GetUnkownShip.serveraddress=serverlistaddress[servernum];
-        GetUnkownShip.servername=serverlistname[servernum]+"-"+serverlistaddress[servernum];
+        serveraddress=serverlistaddress.get(servernum);
+        servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
         servernum++;
-        if(servernum==serverlistaddress.length){
+        if(servernum==serverlistaddress.size()){
             servernum=0;
         }
     }

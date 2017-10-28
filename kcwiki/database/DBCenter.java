@@ -5,6 +5,7 @@
  */
 package moe.kcwiki.database;
 
+import com.alibaba.fastjson.JSONObject;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -22,7 +23,7 @@ public class DBCenter {
     public static HashMap<String, Bgm> BgmDB = new LinkedHashMap<>(); 
     public static HashMap<String, Mission> MissionDB = new LinkedHashMap<>();
     
-    public static HashMap<String, Ship> NewShipDB = new LinkedHashMap<>();  
+        public static HashMap<String, Ship> NewShipDB = new LinkedHashMap<>();  
     public static HashMap<String, SlotItem> NewSlotitemDB = new LinkedHashMap<>();  
     public static HashMap<String, Furniture> NewFurnitureDB = new LinkedHashMap<>();  
     public static HashMap<String, UseItem> NewUseitemDB = new LinkedHashMap<>();  
@@ -51,6 +52,9 @@ public class DBCenter {
     public static HashMap<String, Ship> TempShipDB1 = new LinkedHashMap<>();  
     public static HashMap<String, Ship> TempShipDB2 = new LinkedHashMap<>();  
     public static HashMap<String, Ship> TempShipDB3 = new LinkedHashMap<>();  
+    
+    public static HashMap<String, String> beforeShipSortNO = new LinkedHashMap<>();  
+    public static HashMap<String, JSONObject> JsonPatch = new LinkedHashMap<>();  
     
 
     public static boolean reset(){
@@ -92,6 +96,9 @@ public class DBCenter {
         TempShipDB1.clear();
         TempShipDB2.clear();
         TempShipDB3.clear();
+        
+        beforeShipSortNO.clear();
+        JsonPatch.clear();
         return true;
     }
 }

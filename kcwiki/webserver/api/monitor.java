@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class monitor {
         this.addString("getDataFolder: "+MainServer.getDataFolder()+"\tisExists\t"+new File(MainServer.getDataFolder()).exists());
         this.addString("getPublishFolder: "+MainServer.getPublishFolder()+"\tisExists\t"+new File(MainServer.getPublishFolder()).exists());
         this.addString("getLogFolder: "+MainServer.getLogFolder()+"\tisExists\t"+new File(MainServer.getLogFolder()).exists());
-        this.addString("getPreviousFolder: "+MainServer.getPreviousFolder()+"isExists\t"+new File(MainServer.getPreviousFolder()).exists());
+        this.addString("getPreviousFolder: "+MainServer.getPreviousFolder()+"\tisExists\t"+new File(MainServer.getPreviousFolder()).exists());
         this.addString("getWorksFolder: "+MainServer.getWorksFolder()+"\tisExists\t"+new File(MainServer.getWorksFolder()).exists());
         this.addString("getLocaloldstart2data: "+MainServer.getLocaloldstart2data()+"\tisExists\t"+new File(MainServer.getLocaloldstart2data()).exists());
       } else {
@@ -154,18 +155,25 @@ public class monitor {
       
       this.addString(LINESEPARATOR);
       this.addString("各项实时数据： ");
-      this.addString("AddressList.size(): "+moe.kcwiki.database.DBCenter.AddressList.size());
+      HashMap<String,String> worldMap = MainServer.getWorldMap();
+      for(String id:worldMap.keySet()) {
+          this.addString("id: " + id + "\t ip: " + worldMap.get(id));
+      }
+      this.addString("getWorldListSize: " + worldMap.size());
+      
+      this.addString("AddressList.size(): " + moe.kcwiki.database.DBCenter.AddressList.size());
+      
       List UrlList = msgPublish.getUrlList();
       UrlList.forEach((json) -> {
           this.addString("getUrlList: "+JSON.toJSONString(json));
         });
-      this.addString("getUrlListSize: "+msgPublish.getUrlListSize());
+      this.addString("getUrlListSize: " + UrlList.size());
       
       List UrlprePublishList = msgPublish.getUrlprePublishList();
       UrlprePublishList.forEach((json) -> {
           this.addString("getUrlList: "+JSON.toJSONString(json));
         });
-      this.addString("getUrlprePublishList: "+msgPublish.getUrlprePublishListSize());
+      this.addString("getUrlprePublishList: " + UrlprePublishList.size());
       
       if(CoreDecrypt.shipAddressList != null){
           CoreDecrypt.shipAddressList.keySet().forEach((_item) -> {

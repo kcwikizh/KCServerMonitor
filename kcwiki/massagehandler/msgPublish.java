@@ -28,6 +28,7 @@ public class msgPublish {
     private static final List urlList = Collections.synchronizedList(new ArrayList());
     private static final List urlprePublishList = Collections.synchronizedList(new ArrayList());
     private static boolean allowPublish = true;
+    private static String urlprefix = "/KcWikiOnline/custom/Publishing/";
     //private static boolean init = false;
     /**
     *
@@ -87,7 +88,7 @@ public class msgPublish {
     
     public static boolean urlPublisher(String path,String name){
         LinkedHashMap objMap = new LinkedHashMap<>();
-        String url = "/Publishing" + path.substring(MainServer.getPublishFolder().length(), path.length());
+        String url = urlprefix + path.substring(MainServer.getPublishFolder().length(), path.length());
         objMap.put("name", name);
         objMap.put("src", url);
         getUrlList().add(objMap.clone());
@@ -106,7 +107,7 @@ public class msgPublish {
         //msgPublish.msgPublisher("fileList.length"+fileList.length,0,1);
         if(fileList!=null){
             for (File file : fileList) {
-                url = "/Publishing" + file.getAbsolutePath().substring(MainServer.getPublishFolder().length(), file.getAbsolutePath().length());
+                url = urlprefix + file.getAbsolutePath().substring(MainServer.getPublishFolder().length(), file.getAbsolutePath().length());
                 objMap.put("name", name);
                 objMap.put("src", url);
                 getUrlList().add(objMap.clone());
@@ -130,7 +131,7 @@ public class msgPublish {
         //msgPublish.msgPublisher("fileList.length"+fileList.length,0,1);
         if(fileList!=null){
             String folderName = new File(folder).getName();
-            String publishFolder = "/Publishing" + folder.substring(MainServer.getPublishFolder().length(),folder.length());
+            String publishFolder = urlprefix + folder.substring(MainServer.getPublishFolder().length(),folder.length());
             if(fileList.length == 2){
                 for(String file:enemy){
                     objMap.put("name", folderName);
@@ -172,7 +173,7 @@ public class msgPublish {
                     if(frames.exists()){
                             String mapPath = frames.getAbsolutePath()+FILESEPARATOR+"2.png";
                             if(new File(mapPath).exists()){
-                                url = "/Publishing" + mapPath.substring(MainServer.getPublishFolder().length(),mapPath.length());
+                                url = urlprefix + mapPath.substring(MainServer.getPublishFolder().length(),mapPath.length());
                                 objMap.put("name", mapfolder.getName());
                                 objMap.put("src", url);
                                 getUrlList().add(objMap.clone());
@@ -193,7 +194,7 @@ public class msgPublish {
     
     public static boolean urlPrePublisher(String path,String name){
         LinkedHashMap objMap = new LinkedHashMap<>();
-        String url = "/Publishing"+path.substring(MainServer.getPublishFolder().length(), path.length());
+        String url = urlprefix + path.substring(MainServer.getPublishFolder().length(), path.length());
         objMap.put("name", name);
         objMap.put("src", url);
         getUrlprePublishList().add(objMap.clone());
@@ -228,7 +229,7 @@ public class msgPublish {
                     }
                 }
                 */
-                url = "/Publishing" + ship.getAbsolutePath().substring(MainServer.getPublishFolder().length(), ship.getAbsolutePath().length());
+                url = urlprefix + ship.getAbsolutePath().substring(MainServer.getPublishFolder().length(), ship.getAbsolutePath().length());
                 objMap.put("name", ship.getName());
                 objMap.put("src", url);
                 getUrlprePublishList().add(objMap.clone());
