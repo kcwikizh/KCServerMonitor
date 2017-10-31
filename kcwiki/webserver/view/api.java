@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import moe.kcwiki.init.MainServer;
 import org.apache.commons.lang3.StringUtils;
 import moe.kcwiki.webserver.api.*;
@@ -49,12 +50,12 @@ public class api extends HttpServlet {
     response.setContentType("text/html;charset=UTF-8;pageEncoding=UTF-8"); 
             
     HashMap<String, Object> data = new  HashMap<>();
-
+    HttpSession session = request.getSession(false); 
         String parameter = request.getParameter("query");
         String user = request.getParameter("user");
         String token = request.getParameter("token");
         //MainServer.setZipFolder(Long.parseLong("123411144"));
-        Long date = MainServer.getZipFolder() ;
+        //Long date = MainServer.getZipFolder() ;
         if(parameter == null ){
             data.put("status", "error");
             data.put("data", "请附带请求参数。");
@@ -69,6 +70,9 @@ public class api extends HttpServlet {
                     sb.append(new download().getData());
                     break;
                 case "monitor":
+                    if(session==null || session.getAttribute("hsaLogin")!="true"){
+                        break;
+                    }
                     sb.append(new monitor().getData());
                     break; 
                 case "whatsnew":
@@ -77,6 +81,14 @@ public class api extends HttpServlet {
                 case "jsonpatch":
                     sb.append(new jsonpatch().getData());
                     break; 
+                case "unpackswf":
+                    if(session==null || session.getAttribute("hsaLogin")!="true"){
+                        break;
+                    }
+                    String src = request.getParameter("src");
+                    String dest = request.getParameter("dest");
+                    sb.append(new unpackswf().getData(src,dest));
+                    break;
                 case "admin":
                     break; 
                 case "null":
