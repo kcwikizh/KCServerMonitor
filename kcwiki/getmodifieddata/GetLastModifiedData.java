@@ -105,7 +105,9 @@ public class GetLastModifiedData {
             int countno=1;
             while(!isStopScanner()){
                 msgPublish.msgPublisher("开始第"+countno+"轮文件扫描。",0,0);
-                getNewData(modifidedData);
+                if(getNewData(modifidedData)) {
+                    break;
+                }
                 countno++;
                 try {
                     if(isStopScanner()){
@@ -161,6 +163,7 @@ public class GetLastModifiedData {
 
     public boolean getNewData(JSONArray shipdata) {
          //msgPublish.msgPublisher("shipdata: "+JSON.toJSONString(shipdata),0,0); 
+         boolean isFinish = false;
                 Iterator iterator=shipdata.iterator();
                 while(iterator.hasNext()){
                     if(isStopScanner()){
@@ -177,7 +180,11 @@ public class GetLastModifiedData {
                             }*/
                             url=MainServer.getKcwikiServerAddress();
                             //url=MainServer.getKcwikiServerAddress();
-                            if (getMDD(url+object.getString("path"),Long.parseLong(object.getString("timestamp")),-1,serveraddress)) {
+                            String path = object.getString("path");
+                            if (getMDD(url+path,Long.parseLong(object.getString("timestamp")),-1,serveraddress)) {
+                                if(path.toLowerCase().contains("core")){
+                                   isFinish = true; 
+                                }
                                 break;
                             }
                             count++;
@@ -186,7 +193,7 @@ public class GetLastModifiedData {
                     //msgPublish.msgPublisher("ID:"+shipid+"扫描完毕。",0);
                 }
 
-        return true;
+        return isFinish;
     }
 
     public boolean getMDD(String URL,Long flie,int nameNo,String serveraddress){

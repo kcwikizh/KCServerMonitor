@@ -109,6 +109,7 @@ public class GetUnkownShip {
         }
         JSONArray md5Data=JSON.parseArray(str);
         Iterator iterator=md5Data.iterator();
+        md5DataSet.add(null);
                 while(iterator.hasNext()){
                     JSONObject object=(JSONObject)iterator.next();
                     md5DataList.add(object);
@@ -324,10 +325,10 @@ public class GetUnkownShip {
                                 }
                                 JSONObject data = it.next(); 
                                 try {
-                                    if (getMDD("http://"+serveraddress+"/kcs/"+data.getString("path")+".swf",data.getLong("timestamp"))) {
+                                    if (getMDD("http://"+serveraddress+"/kcs/"+data.getString("path"),data.getLong("timestamp"))) {
                                         it.remove();
-                                        int i=data.getString("path").lastIndexOf("/"); //取得子串的初始位置
-                                        String filename=data.getString("path").substring(i+1,data.getString("path").length());
+                                        String filename=data.getString("filename");
+                                        msgPublish.msgPublisher("当前尝试立绘文件： "+data.getString("id")+"\t"+"http://"+serveraddress+"/kcs/"+data.getString("path"),0,0);
                                         if(md5DataSet.contains(Hash.getNewHash(rootFolder+File.separator+filename+".swf"))){
                                             continue;
                                         }

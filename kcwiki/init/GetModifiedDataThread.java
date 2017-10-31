@@ -75,14 +75,14 @@ public class GetModifiedDataThread {
                         modifieddataPool.takeTask();
                     }
                     while(!modifieddataPool.isTerminated()){
-                        sleep(10*1000);
+                        sleep(5*1000);
                     }
                     msgPublish.msgPublisher("等待语音下载线程结束。",0,1);
                     corePool.takeTask();
                     msgPublish.msgPublisher(new Date() +constant.LINESEPARATOR+"扫描文件\t主线程运行结束",0,1);
                     //MainGui.btnctl(1,true);
                     if(Controller.isIsPoolInit()){
-                        modifieddataPool.ininPool();
+                        modifieddataPool.initPool();
                     }
                     modifieddataPool.setIsOnline(false);
                     isFinish=true;

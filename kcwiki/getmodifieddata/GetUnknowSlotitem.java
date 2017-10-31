@@ -56,7 +56,7 @@ public class GetUnknowSlotitem {
     private static int servernum=0;
     public static LinkedHashMap<String, String> unknowShipList = new LinkedHashMap<>(); 
     private final java.util.ArrayList<String>  dataList;
-    private final String rootFolder = MainServer.getTempFolder() + File.separator+"newSlotItem";
+    private final String rootFolder = MainServer.getPublishFolder()+ File.separator+"newSlotItem";
     //String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
     private static List<String> serverlistaddress = MainServer.getWorldList();
     private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
@@ -98,12 +98,12 @@ public class GetUnknowSlotitem {
                         }else{
                             serverAddress();
                              //msgPublish.msgPublisher("slotitemNo: "+slotitemNo,0,1);
-                            if(no != Integer.valueOf(slotitemNo)&& no > 350){
+                            if(no != Integer.valueOf(slotitemNo) && no > 300){
                                 msgPublish.msgPublisher("扫描到新装备，已下载完毕",0,1);
                                 msgPublish.urlListPublisher(rootFolder+File.separator+"card","newSlotitem");
                                 return taskID;
                             }
-                            if(no>300){
+                            if(no > 300){
                                 no=Integer.valueOf(slotitemNo);
                                 try{
                                     sleep(60*1000);

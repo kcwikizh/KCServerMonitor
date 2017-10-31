@@ -49,7 +49,7 @@ public class Controller {
         start2dataPool.setIsOnline(false);
         Start2DataThread.setHasStart2(false);
         corePool.ininPool();
-        modifieddataPool.ininPool();
+        modifieddataPool.initPool();
         start2dataPool.ininPool();
         msgPublish.cleanArrayList();
         DBCenter.reset();

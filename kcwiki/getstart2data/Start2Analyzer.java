@@ -68,11 +68,11 @@ public class Start2Analyzer {
                 startdata=buffer.substring(buffer.indexOf("svdata=")+66, buffer.length()-1);
             }
         }
+        newstart2 = startdata;
         
         String  prefix="api_mst_";
         try{
             JSONObject Data=JSON.parseObject(startdata);
-            newstart2 = JSON.toJSONString(Data);
             
             try (BufferedWriter Obfr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(MainServer.getTempFolder()+File.separator+"Start2_UTF8.json")), "UTF-8"))) {
                 Obfr.write(Data.toJSONString());
@@ -467,11 +467,11 @@ public class Start2Analyzer {
                 Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        oldstart2 = startdata;
         
         String  prefix="api_mst_";
         try{
             JSONObject Data=JSON.parseObject(startdata);
-            oldstart2 = JSON.toJSONString(Data);
             Map<String,JSONObject> tempMap=new LinkedHashMap<>();
 
             for (String type:typelist){
@@ -1097,13 +1097,21 @@ public class Start2Analyzer {
                     eBfw.write(Data+constant.LINESEPARATOR);
                 }
                 eBfw.write(constant.LINESEPARATOR+constant.LINESEPARATOR);
-                eBfw.write("下载链接如下："+constant.LINESEPARATOR+constant.LINESEPARATOR);                
+                eBfw.write("下载链接如下："+constant.LINESEPARATOR+constant.LINESEPARATOR); 
+                String wikiID;
                 for( Map.Entry<String,SlotItem> map : DBCenter.NewSlotitemDB.entrySet()){
                     if(map.getKey()==null){continue;}
-                    nData=map.getValue().getApi_id();
-                    if(Integer.parseInt(map.getValue().getApi_id())>499){break;}
-                    if(Integer.parseInt(map.getValue().getApi_id())<100){nData="0"+map.getValue().getApi_id();}
-                    if(Integer.parseInt(map.getValue().getApi_id())<10){nData="00"+map.getValue().getApi_id();}
+                    nData = map.getValue().getApi_id();
+                    wikiID = map.getValue().getApi_sortno();
+                    //if(Integer.parseInt(map.getValue().getApi_id())>499){continue;}
+                    if(Integer.parseInt(map.getValue().getApi_id())<100){
+                        nData = "0" + map.getValue().getApi_id();
+                        wikiID = "0" + map.getValue().getApi_sortno();
+                    }
+                    if(Integer.parseInt(map.getValue().getApi_id())<10){
+                        nData = "00" + map.getValue().getApi_id();
+                        wikiID = "00" + map.getValue().getApi_sortno();
+                    }
                     for(int count=0;count<4;count++){
                         Data="";
                         if(count==0){Data=downloadserver+"resources/image/slotitem/card/"+nData+".png";}
@@ -1111,7 +1119,7 @@ public class Start2Analyzer {
                         if(count==2){Data=downloadserver+"resources/image/slotitem/item_on/"+nData+".png";}
                         if(count==3){Data=downloadserver+"resources/image/slotitem/item_up/"+nData+".png";}
                         eBfw.write(Data+constant.LINESEPARATOR);
-                        DBCenter.AddressList.put(Data,nData+".png");
+                        DBCenter.AddressList.put(Data,wikiID+".png");
                     } 
                 }
             }
@@ -1126,7 +1134,11 @@ public class Start2Analyzer {
                     if(map.getKey()==null){continue;}
                     Data=map.getValue().getApi_title();
                     //Data="http://voice.kcwiki.moe/resources/image/slotItem/card/"+String.valueOf(Integer.parseInt(newData.nFurniture[i][0])-1)+".png";
-                    if(Integer.parseInt(map.getValue().getApi_season())!=0){eBfw.write(Data+"\t季节限定！"+constant.LINESEPARATOR);}else{eBfw.write(Data+constant.LINESEPARATOR);}
+                    if(Integer.parseInt(map.getValue().getApi_season())!=0){
+                        eBfw.write(Data+"\t季节限定！"+constant.LINESEPARATOR);
+                    }else{
+                        eBfw.write(Data+constant.LINESEPARATOR);
+                    }
                 }
                 eBfw.write(constant.LINESEPARATOR+constant.LINESEPARATOR);
                 eBfw.write("下载链接如下："+constant.LINESEPARATOR+constant.LINESEPARATOR);                
@@ -1345,7 +1357,7 @@ public class Start2Analyzer {
         }else{
             msgPublish.msgPublisher("Start2内没有发现任何新文件。",0,0);
         }
-        //jsonPatch();
+        jsonPatch();
         return true;
     }
     
@@ -1353,21 +1365,18 @@ public class Start2Analyzer {
         if(newstart2 == null || oldstart2 == null){
             return false;
         }  
-        HashMap<String, JSONObject> JsonPatch1 = new LinkedHashMap<>();  
-        HashMap<String, JSONObject> JsonPatch2 = new LinkedHashMap<>();  
         try {
             ObjectMapper jackson = new ObjectMapper();
             JsonNode oldNode = jackson.readTree(oldstart2);
             JsonNode newNode = jackson.readTree(newstart2);
             JsonNode patchNode = JsonDiff.asJson(oldNode, newNode);
-            JSONArray jarr = JSON.parseArray(patchNode.toString());
-            /*for(JsonNode jn:patchNode){
+            for(JsonNode jn:patchNode){
                 JSONObject obj =  JSON.parseObject(jn.toString());
                 if(jn.has("path")){
-                    //DBCenter.JsonPatch.put(jn.get("path").asText(), obj);
-                    JsonPatch1.put(jn.get("path").asText(), obj);
+                    DBCenter.JsonPatch.put(jn.get("path").textValue(), obj);
                 }
-            }*/
+            }
+            /*JSONArray jarr = JSON.parseArray(patchNode.toString());
             if(patchNode.size() != 0) {
                 for(int i = 0; i<jarr.size(); i++){
                     JSONObject obj =  jarr.getJSONObject(i);
@@ -1375,7 +1384,7 @@ public class Start2Analyzer {
                         DBCenter.JsonPatch.put(obj.getString("path"), obj);
                     }
                 }
-            }
+            }*/
             /*oldNode = jackson.readTree(JSON.toJSONString(JsonPatch1));
             newNode = jackson.readTree(JSON.toJSONString(JsonPatch2));
             patchNode = JsonDiff.asJson(oldNode, newNode);
@@ -1390,10 +1399,10 @@ public class Start2Analyzer {
     }
     
     
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         MainServer.setLocaloldstart2("L:\\NetBeans\\NetBeansProjects\\KcWikiOnline\\tmp\\tmp.json");
         MainServer.setTempFolder("L:\\NetBeans\\NetBeansProjects\\KcWikiOnline\\tmp");
         Start2Analyzer analyzer = new Start2Analyzer();
         analyzer.ReadNewFile(null);
-    }
+    }*/
 }

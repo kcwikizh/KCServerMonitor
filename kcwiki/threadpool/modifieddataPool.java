@@ -127,7 +127,7 @@ public class modifieddataPool {
         return true;
     }
     
-    public static boolean ininPool(){
+    public static boolean initPool(){
         if(isIsInit()){
             return false;
         }

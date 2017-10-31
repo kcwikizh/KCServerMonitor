@@ -180,24 +180,25 @@ public class DLThread {
                     if(reCode==1){ 
                         value++;  
                         if(!opPath.contains(".swf")){
+                            String relativePath = filePath.substring(rootFolder.length()+1, filePath.length());
+                            File srcFile = new File(opPath);
+                            //File pubFolder = new File(MainServer.getPublishFolder()+File.separator+relativePath);
+                            //FileUtils.copyFileToDirectory(srcFile, pubFolder);
+                            File workFolder = new File(MainServer.getWorksFolder()+File.separator+relativePath);
+                            FileUtils.copyFileToDirectory(srcFile, workFolder);
                             //msgPublish.msgPublisher("!swf",0,0);
-                            if(opPath.contains("slotitem") &&  opPath.contains("card")){
+                            if(opPath.contains("Soubi"+fileName+Server.slotitemrule.get("card")+".png")) {
                                 //msgPublish.msgPublisher("slotitem:"+opPath,0,0);
-                                msgPublish.urlPrePublisher(opPath, fileName);
+                                msgPublish.urlPrePublisher(workFolder +File.separator+ srcFile.getName() , fileName);
                             }
                             if(opPath.contains("furniture") ){
                                 //msgPublish.msgPublisher("furniture:"+opPath,0,0);
-                                msgPublish.urlPrePublisher(opPath, fileName);
+                                msgPublish.urlPrePublisher(workFolder +File.separator+ srcFile.getName() , fileName);
                             }
-                            if(opPath.contains("furniture") ){
+                            if(opPath.contains("useitem") ){
                                 //msgPublish.msgPublisher("useitem:"+opPath,0,0);
-                                msgPublish.urlPrePublisher(opPath, fileName);
+                                msgPublish.urlPrePublisher(workFolder +File.separator+ srcFile.getName() , fileName);
                             }
-                            String relativePath = filePath.substring(rootFolder.length()+1, filePath.length());
-                            if(! new File(MainServer.getWorksFolder()+File.separator+relativePath).exists()){
-                                new File(MainServer.getWorksFolder()+File.separator+relativePath).mkdirs();
-                            }
-                            FileUtils.copyFileToDirectory(new File(opPath), new File(MainServer.getWorksFolder()+File.separator+relativePath));
                         }
                         //moe.kcwiki.massagehandler.MainGui.jProgressBar1.setValue(value); 
                     }
@@ -330,4 +331,7 @@ public class DLThread {
         return true;
     }
       
+    public String getFileName(String path) {
+        return new File(path).getName().replaceAll("[.][^.]+$", "");
+    }
 }

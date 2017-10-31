@@ -19,6 +19,7 @@ import moe.kcwiki.database.*;
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.constant;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -47,7 +48,11 @@ public class MakeNewShipData {
                 if(count == 1) {
                     eBfw.write("\t,"+constant.LINESEPARATOR);
                 }
-                eBfw.write("\t[\"\"] = {"+constant.LINESEPARATOR);
+                String wikiID = DBCenter.NewShipDB.get(key).getApi_sortno();
+                if( wikiID == null || StringUtils.isBlank(wikiID)){
+                    wikiID = DBCenter.beforeShipSortNO.get(DBCenter.NewShipDB.get(key).getApi_id()) + "a";
+                } 
+                eBfw.write("\t[\""+wikiID+"\"] = {"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"ID\"] = "+DBCenter.NewShipDB.get(key).getApi_id()+","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"图鉴号\"] = "+DBCenter.NewShipDB.get(key).getApi_sortno()+","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"日文名\"] = \""+DBCenter.NewShipDB.get(key).getApi_name()+"\","+constant.LINESEPARATOR);

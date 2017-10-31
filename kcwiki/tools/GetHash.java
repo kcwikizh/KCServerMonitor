@@ -5,6 +5,7 @@
  */
 package moe.kcwiki.tools;
 
+import java.io.File;
 import java.io.FileInputStream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -24,6 +25,9 @@ public class GetHash {
         }
     
         public static String getMD5Checksum(String filename) throws Exception {
+            if(!new File(filename).exists()){
+                return null;
+            }
             FileInputStream fis= new FileInputStream(filename);    
             String md5 = DigestUtils.md5Hex(IOUtils.toByteArray(fis));
             IOUtils.closeQuietly(fis);  

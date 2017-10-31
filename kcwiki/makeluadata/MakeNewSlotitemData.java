@@ -33,18 +33,18 @@ public class MakeNewSlotitemData {
             for (String key : keys){
                 count++;
                 if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id()) >= 500){continue;}
-                String id;
-                if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id())<10){
-                    id="00"+DBCenter.NewSlotitemDB.get(key).getApi_id();
-                }else if(9<Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id())&&Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_id())<100){
-                    id="0"+DBCenter.NewSlotitemDB.get(key).getApi_id();
+                String wikiID;
+                if(Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_sortno())<10){
+                    wikiID="00"+DBCenter.NewSlotitemDB.get(key).getApi_sortno();
+                }else if(9<Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_sortno())&&Integer.parseInt(DBCenter.NewSlotitemDB.get(key).getApi_sortno())<100){
+                    wikiID="0"+DBCenter.NewSlotitemDB.get(key).getApi_sortno();
                 }else{
-                    id=DBCenter.NewSlotitemDB.get(key).getApi_id();
+                    wikiID=DBCenter.NewSlotitemDB.get(key).getApi_sortno();
                 }
                 if(count == 1) {
                     eBfw.write("\t,"+constant.LINESEPARATOR);
                 }
-                eBfw.write("\t[\""+id+"\"] = {"+constant.LINESEPARATOR);
+                eBfw.write("\t[\""+wikiID+"\"] = {"+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"日文名\"] = \""+DBCenter.NewSlotitemDB.get(key).getApi_name()+"\","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"中文名\"] = \"\","+constant.LINESEPARATOR);
                 eBfw.write("\t\t[\"类别\"] = {"+DBCenter.NewSlotitemDB.get(key).getApi_type().substring(1, DBCenter.NewSlotitemDB.get(key).getApi_type().length()-1)+"},"+constant.LINESEPARATOR);
