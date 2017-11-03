@@ -7,15 +7,8 @@ package moe.kcwiki.init;
 
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Thread.sleep;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
-import javax.servlet.ServletException;  
-import javax.servlet.http.HttpServlet; 
 import org.apache.commons.io.FileUtils;
 
 /**

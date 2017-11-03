@@ -10,7 +10,6 @@ import moe.kcwiki.database.DBCenter;
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.massagehandler.msgPublish;
-import static moe.kcwiki.threadpool.corePool.takeTask;
 
 /**
  *

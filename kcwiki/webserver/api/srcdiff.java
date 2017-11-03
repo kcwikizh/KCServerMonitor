@@ -38,6 +38,6 @@ public class srcdiff {
 
     
     private void addString(String str) {
-        sb.append(str + LINESEPARATOR + "</br>"+ LINESEPARATOR);
+        sb.append(str).append(LINESEPARATOR).append("</br>").append(LINESEPARATOR);
     }
 }

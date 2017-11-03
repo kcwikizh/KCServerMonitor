@@ -5,43 +5,22 @@
  */
 package moe.kcwiki.getmodifieddata;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import static java.lang.Thread.sleep;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import moe.kcwiki.init.MainServer;
 import static moe.kcwiki.init.MainServer.isStopScanner;
-import moe.kcwiki.unpackswf.ImgPacker;
-import moe.kcwiki.unpackswf.Server;
 import moe.kcwiki.massagehandler.msgPublish;
 import static moe.kcwiki.threadpool.getUnkownSlotitemPool.*;
-import moe.kcwiki.tools.constant;
 
 /**
  *

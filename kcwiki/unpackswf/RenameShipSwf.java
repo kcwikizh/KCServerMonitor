@@ -5,25 +5,20 @@
  */
 package moe.kcwiki.unpackswf;
 
-import com.alibaba.fastjson.JSON;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import moe.kcwiki.database.DBCenter;
 import moe.kcwiki.database.Ship;
-import moe.kcwiki.init.GetModifiedDataThread;
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.massagehandler.msgPublish;
 import static moe.kcwiki.massagehandler.msgPublish.msgPublisher;
 import moe.kcwiki.threadpool.start2dataPool;
-import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -211,7 +206,6 @@ public class RenameShipSwf {
                                         }
                                     }
                                 }
-                                
                             }
                         }
                     }

@@ -22,7 +22,7 @@ public class unpackswf {
     
     public String getData(String src,String dest) {
         sb = new StringBuilder();
-        new UnpackSwf().ffdec(dest,src);
+        new UnpackSwf().createDiffFile(dest,src);
         this.addString("");
         
         return sb.toString();
@@ -52,6 +52,6 @@ public class unpackswf {
 
     
     private void addString(String str) {
-        sb.append(str + LINESEPARATOR + "</br>"+ LINESEPARATOR);
+        sb.append(str).append(LINESEPARATOR).append("</br>").append(LINESEPARATOR);
     }
 }

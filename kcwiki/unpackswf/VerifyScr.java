@@ -5,11 +5,7 @@
  */
 package moe.kcwiki.unpackswf;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,8 +16,6 @@ import moe.kcwiki.init.GetModifiedDataThread;
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.picscanner.GetHash;
 import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.RWFile;
-import moe.kcwiki.tools.constant;
 
 /**
  *
@@ -34,7 +28,6 @@ public class VerifyScr {
     private static String oldFile;
     
     public boolean verifyscr(String newFileFolder,String oldFileFolder) {
-        GetModifiedDataThread.addJob();
         new Thread() {  //创建新线程用于下载
             @Override
             public void run() {
@@ -44,26 +37,19 @@ public class VerifyScr {
                 int newScr=0;
                 int oldScr;
                 scrDelList.clear();
-                try {
+                
+                if(new File(oldFileFolder).exists()){
+                    scrDelList=readOldScr(oldFileFolder,scrDelList);
+                    oldScr=scrDelList.size();
+                    String filename=newFileFolder.substring(0, newFileFolder.lastIndexOf(File.separator));
+                    newScr=readNewScr(newFileFolder,scrDelList,newScr);
                     
-                    if(new File(oldFileFolder).exists()){
-                        scrDelList=readOldScr(oldFileFolder,scrDelList);
-                        oldScr=scrDelList.size();
-                        newScr=readNewScr(newFileFolder,scrDelList,newScr);
-                        
-                        String filename=oldFileFolder.substring(0, oldFileFolder.lastIndexOf(File.separator));
-                        swfSrcPatch.put(newFileFolder.substring(rootFolder.length()+1, newFileFolder.length()), fileData.clone());
-                        fileData.clear();
-                        msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr MD5互查对比完成，剩余文件："+(oldScr-newScr),0,0);
-                        sleep(1*1000);
-                        scrDelList.clear();
-                        //String data = JSON.toJSONString(swfSrcPatch,SerializerFeature.BrowserCompatible);
-                    }
-                    GetModifiedDataThread.finishJob();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(moe.kcwiki.picscanner.Controller.class.getName()).log(Level.SEVERE, null, ex);
-                    msgPublish.msgPublisher("对比脚本失败。",0,-1);
-                    return ;
+                    swfSrcPatch.put(newFileFolder.substring(rootFolder.length()+1, newFileFolder.length()), fileData.clone());
+                    fileData.clear();
+                    
+                    msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr MD5互查对比完成，剩余文件："+(oldScr-newScr),0,0);
+                    scrDelList.clear();
+                    //String data = JSON.toJSONString(swfSrcPatch,SerializerFeature.BrowserCompatible);
                 }    
             }
         }.start();
@@ -122,7 +108,6 @@ public class VerifyScr {
                     }
                     //String tempfolder=readfile.getAbsolutePath().substring(0,readfile.getAbsolutePath().lastIndexOf(File.separator) );
                     //count=count+delFiles(tempfolder,scrDelList);
-                    
                 } else if (readfile.isDirectory()) {
                     count=readNewScr(filepath + File.separator + filelist[i],scrDelList,count);
                 }
@@ -154,7 +139,7 @@ public class VerifyScr {
         return count;
     }
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         MainServer.setTempFolder("C:\\Users\\VEP\\Desktop\\test\\test");
         rootFolder = MainServer.getTempFolder()+File.separator+"currentswf";
         try {
@@ -163,6 +148,6 @@ public class VerifyScr {
         } catch (Exception ex) {
             Logger.getLogger(VerifyScr.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
     
 }

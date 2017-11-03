@@ -5,33 +5,21 @@
  */
 package moe.kcwiki.downloader;
 
-import com.alibaba.fastjson.JSON;
 import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.init.MainServer;
-
 import moe.kcwiki.init.GetModifiedDataThread;
-import java.awt.HeadlessException;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import moe.kcwiki.database.*;
 import moe.kcwiki.decryptcore.*;
 import static moe.kcwiki.decryptcore.CoreDecrypt.shipDataList;
 import moe.kcwiki.unpackswf.Server;
-import moe.kcwiki.database.DBCenter.*;
 import moe.kcwiki.massagehandler.msgPublish;
 import static moe.kcwiki.massagehandler.msgPublish.mapurlListPublisher;
 import moe.kcwiki.threadpool.Controller;
 import moe.kcwiki.threadpool.corePool;
 import moe.kcwiki.threadpool.start2dataPool;
-import static moe.kcwiki.threadpool.start2dataPool.addTask;
 import static moe.kcwiki.threadpool.start2dataPool.getTaskNum;
 import moe.kcwiki.tools.constant;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;

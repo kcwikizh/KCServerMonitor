@@ -5,22 +5,9 @@
  */
 package moe.kcwiki.getstart2data;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import moe.kcwiki.database.DBCenter;
 import moe.kcwiki.database.Ship;
-import moe.kcwiki.init.GetModifiedDataThread;
-
-import moe.kcwiki.init.MainServer;
-import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
 
 /**
  *

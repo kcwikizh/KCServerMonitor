@@ -8,9 +8,7 @@ package moe.kcwiki.unpackswf;
 import moe.kcwiki.init.MainServer;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Thread.sleep;
 import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
 
 /**
  *
@@ -37,12 +35,17 @@ public class Controller {
             if(!new moe.kcwiki.decryptcore.CoreRecover().unlockCore(filepath+File.separator+filename, MainServer.getTempFolder())){msgPublish.msgPublisher("Core.swf 解码失败。",0,-1);}
             ffdec.ffdec(outputpath,MainServer.getTempFolder()+File.separator+"Core_hack.swf");
             new moe.kcwiki.decryptcore.CoreDecrypt().getData(outputpath+File.separator+Server.getCoremap(), outputpath+File.separator+Server.getCoresound());
+            filename = "Core_hack.swf";
         }
-        if(new File(previousfolder+File.separator+(filename.substring(0, filename.length()-4))).exists()){
-            msgPublish.msgPublisher(filename+"开始解压分析",0,0);
-            ffdec.ffdec(outputpath,filepath+File.separator+filename);
-            new VerifyScr().verifyscr(outputpath+File.separator+"scripts", previousfolder+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"scripts");
-            verify.verifyimg(outputpath+File.separator+"images", previousfolder+File.separator+(filename.substring(0, filename.length()-4))+File.separator+"images");
+        //filename = (filename.substring(0, filename.length()-4));
+        msgPublish.msgPublisher(previousfolder+File.separator+filename+"\texists： "+new File(previousfolder+File.separator+filename).exists(),0,0);
+        if(new File(previousfolder+File.separator+filename).exists()){
+            if(!filename.contains("Core_hack")){
+                msgPublish.msgPublisher(filename+"\t开始解压",0,0);
+                ffdec.ffdec(outputpath,filepath+File.separator+filename);
+            }
+            new VerifyScr().verifyscr(outputpath+File.separator+"scripts", previousfolder+File.separator+filename+File.separator+"scripts");
+            verify.verifyimg(outputpath+File.separator+"images", previousfolder+File.separator+filename+File.separator+"images");
         } 
     }
 }

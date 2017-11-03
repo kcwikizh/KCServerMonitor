@@ -12,15 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.alibaba.fastjson.*;
-
-
-
-
-import java.io.*;
-import java.net.*;
 import java.util.HashMap;
-import javax.servlet.*;
-import javax.servlet.http.*;
 
 public class guest extends HttpServlet{
     

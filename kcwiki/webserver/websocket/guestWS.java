@@ -14,12 +14,10 @@ import com.alibaba.fastjson.JSON;
 import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;

@@ -15,7 +15,7 @@ import static moe.kcwiki.tools.constant.LINESEPARATOR;
  */
 public class download {
     private StringBuilder sb = null;
-    private static String urlprefix = "/custom/Publishing/";
+    private static final String urlprefix = "/custom/Publishing/";
     
     public String getData() {
         sb = new StringBuilder();
@@ -49,6 +49,6 @@ public class download {
     }
     
     private void addString(String str) {
-        sb.append(str + LINESEPARATOR + "</br>"+ LINESEPARATOR);
+        sb.append(str).append(LINESEPARATOR).append("</br>").append(LINESEPARATOR);
     }
 }

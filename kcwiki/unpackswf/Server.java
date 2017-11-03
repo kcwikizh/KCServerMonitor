@@ -5,7 +5,6 @@
  */
 package moe.kcwiki.unpackswf;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

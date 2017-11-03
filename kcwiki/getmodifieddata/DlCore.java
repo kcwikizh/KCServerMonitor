@@ -5,21 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import moe.kcwiki.tools.CatchError;
-
-import moe.kcwiki.init.MainServer;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
         
 public class DlCore {
             

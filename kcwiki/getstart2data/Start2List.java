@@ -16,10 +16,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import static java.lang.Thread.sleep;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.Proxy;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -27,19 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
-import javax.swing.JOptionPane;
-import moe.kcwiki.init.MainServer;
 import moe.kcwiki.tools.RWFile;
 import static moe.kcwiki.tools.constant.LINESEPARATOR;
 import com.flipkart.zjsonpatch.*;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+/*import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonToken;*/
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.EnumSet;
-import org.apache.commons.lang3.StringUtils;
 
 
 /**

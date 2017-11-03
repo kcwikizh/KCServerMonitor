@@ -10,31 +10,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import static java.lang.Thread.sleep;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.Proxy;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
-import moe.kcwiki.getmodifieddata.DlCore;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.DefaultHttpClient;
 import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
 
 /**
  *
@@ -86,9 +70,7 @@ public class GetPresetData {
                         buffer.append(str).append(constant.LINESEPARATOR);
                         eBfw.write(str+constant.LINESEPARATOR);
                     }
-                }
-                //System.out.print(line);
-                //System.out.print(buffer.toString());    
+                }  
             }
             conn.disconnect();
             return true;

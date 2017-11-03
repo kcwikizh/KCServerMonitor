@@ -5,7 +5,6 @@
  */
 package moe.kcwiki.init;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;

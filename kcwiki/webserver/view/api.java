@@ -6,25 +6,9 @@
 package moe.kcwiki.webserver.view;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.management.CompilationMXBean;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -32,8 +16,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import moe.kcwiki.init.MainServer;
-import org.apache.commons.lang3.StringUtils;
 import moe.kcwiki.webserver.api.*;
 
 /**
@@ -71,6 +53,8 @@ public class api extends HttpServlet {
                     break;
                 case "monitor":
                     if(session==null || session.getAttribute("hsaLogin")!="true"){
+                        data.put("status", "failure");
+                        data.put("data", "请登录后再进行此操作。");
                         break;
                     }
                     sb.append(new monitor().getData());
@@ -83,6 +67,8 @@ public class api extends HttpServlet {
                     break; 
                 case "unpackswf":
                     if(session==null || session.getAttribute("hsaLogin")!="true"){
+                        data.put("status", "failure");
+                        data.put("data", "请登录后再进行此操作。");
                         break;
                     }
                     String src = request.getParameter("src");

@@ -10,20 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.Proxy;
 import java.net.URL;
-import static java.lang.Thread.sleep;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
-import javax.swing.JOptionPane;
-import moe.kcwiki.init.MainServer;
-import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
 
 /**
  *

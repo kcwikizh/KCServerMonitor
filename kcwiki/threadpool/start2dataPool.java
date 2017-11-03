@@ -5,7 +5,6 @@
  */
 package moe.kcwiki.threadpool;
 
-import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -14,7 +13,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -13,8 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;  
 import java.io.IOException;  
 import javax.imageio.ImageIO;  
-import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.tools.constant;
   
 /** 
  * * @author WQ * @date 2011-01-14 * @versions 1.0 图片压缩工具类 提供的方法中可以设定生成的 

@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -23,7 +22,7 @@ import static moe.kcwiki.tools.constant.LINESEPARATOR;
  */
 public class whatsnew {
     private StringBuilder sb = null;
-    private static String file = MainServer.getWorksFolder()+File.separator+"Start2_Export.txt";
+    private static final String file = MainServer.getWorksFolder()+File.separator+"Start2_Export.txt";
     
     public String getData() {
         sb = new StringBuilder();
@@ -59,6 +58,6 @@ public class whatsnew {
 
     
     private void addString(String str) {
-        sb.append(str + LINESEPARATOR + "</br>"+ LINESEPARATOR);
+        sb.append(str).append(LINESEPARATOR).append("</br>").append(LINESEPARATOR);
     }
 }

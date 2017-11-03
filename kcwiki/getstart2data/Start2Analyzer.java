@@ -31,13 +31,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import moe.kcwiki.database.*;
-
 import moe.kcwiki.init.MainServer;
 import moe.kcwiki.init.Start2DataThread;
 import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.CatchError;
 import moe.kcwiki.tools.Encoder;
-import moe.kcwiki.tools.RWFile;
 import moe.kcwiki.tools.constant;
 
 /**

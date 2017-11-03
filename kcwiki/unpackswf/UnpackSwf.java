@@ -10,12 +10,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import static java.lang.Thread.sleep;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +28,7 @@ import static moe.kcwiki.tools.constant.FILESEPARATOR;
 public class UnpackSwf {
     
     private final String ffdecpath = MainServer.getFfdecFolder();
+    private boolean isInit = false;
     
     public synchronized boolean callShell(String shellString){
         try {
@@ -62,6 +60,23 @@ public class UnpackSwf {
             Logger.getLogger(UnpackSwf.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+    
+    public boolean createDiffFile(String folder,String file) {
+        if(isInit){
+            return false;
+        }
+        File[] fileList = new File(file).listFiles();
+        for(File swf:fileList){
+            if(swf.isFile() && swf.getName().contains(".swf")) {
+                if(swf.getName().toLowerCase().contains("core.swf")){
+                    continue;
+                }
+                callShell("java -jar \""+ffdecpath+"\" -export script,image,sound \""+folder+"\" \""+file+"\"");
+            }
+        }
+        isInit = true;
+        return true;
     }
     
     //解压各种游戏swf和批量解压文件夹

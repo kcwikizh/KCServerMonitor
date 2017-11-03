@@ -12,20 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.alibaba.fastjson.*;
-
-
-
-
-import java.io.*;
-import java.net.*;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import javax.servlet.*;
 import javax.servlet.http.*;
-import moe.kcwiki.init.MainCore;
-import moe.kcwiki.init.MainServer;
-import moe.kcwiki.threadpool.Controller;
 
 public class login extends HttpServlet{
     
@@ -37,21 +25,11 @@ public class login extends HttpServlet{
     }
     
     private static HashMap<String, Object> userList;
-    private static boolean isActivative = false;
     
   protected void processRequest(HttpServletRequest request,HttpServletResponse response,String method) throws ServletException,IOException
   {
     response.setContentType("text/xml");
     response.setContentType("text/html;charset=UTF-8;pageEncoding=UTF-8"); 
-    
-    /*if(!MainServer.isInit()){
-        MainServer.init(false); 
-        Controller.ininPool();
-    }
-    if(!isActivative){
-            setUserList(moe.kcwiki.webserver.util.userList.getUserList());
-        isActivative = true ;
-    }*/
     
     String username=request.getParameter("username");
     String password=request.getParameter("password");
@@ -63,8 +41,6 @@ public class login extends HttpServlet{
         if( getUserList().get(username).equals(password)){
             session.setAttribute("hsaLogin", "true");
             data.put("status", "success");
-            //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html");
-            //data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/admin.html");
             String host = request.getServerName();
             if(host.equals("127.0.0.1")){
                 data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
@@ -73,8 +49,6 @@ public class login extends HttpServlet{
             } else if (host.contains("45.")) {
                 data.put("info", request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/KcWikiOnline/admin.html"); 
             }
-            //data.put("info", request.getScheme()+"://"+"x.kcwiki.org/admin.html");
-            
         }else{
             data.put("status", "error");
             data.put("info", "账号或密码错误");

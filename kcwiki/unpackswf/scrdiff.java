@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import moe.kcwiki.massagehandler.msgPublish;
 import moe.kcwiki.tools.Encoder;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 
 /**
  *

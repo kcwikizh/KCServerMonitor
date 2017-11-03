@@ -9,15 +9,10 @@ import com.alibaba.fastjson.JSON;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import moe.kcwiki.init.MainServer;
 import static moe.kcwiki.tools.constant.FILESEPARATOR;
-import moe.kcwiki.unpackswf.Server;
 
 /**
  *

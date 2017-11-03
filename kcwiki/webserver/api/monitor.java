@@ -95,7 +95,6 @@ public class monitor {
                 byte[] by = new byte[1024];
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                // 将内容读取内存中
                 int len = -1;
                 while ((len = is.read(by)) != -1) {
                     bos.write(by, 0, len);
@@ -329,6 +328,6 @@ public class monitor {
     }
     
     private void addString(String str) {
-        sb.append(str + LINESEPARATOR + "</br>"+ LINESEPARATOR);
+        sb.append(str).append(LINESEPARATOR).append("</br>").append(LINESEPARATOR);
     }
 }

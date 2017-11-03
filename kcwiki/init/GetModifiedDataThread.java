@@ -7,7 +7,6 @@ package moe.kcwiki.init;
 
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
