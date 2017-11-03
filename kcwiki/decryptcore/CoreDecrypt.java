@@ -240,7 +240,7 @@ public class CoreDecrypt {
                 int voiceId=0;
                 String ship=item.getKey();
                 //if(Integer.valueOf(ship)>500&&Integer.valueOf(ship)<800){continue;}
-                if(Integer.valueOf(ship)>1500){continue;}
+                if(Integer.valueOf(ship) >= 1500){continue;}
                 for (String one:sourceStrArray){
                     voiceId++;
                     if(voiceId==sourceStrArray.length){break;}

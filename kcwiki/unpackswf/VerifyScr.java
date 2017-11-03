@@ -5,6 +5,8 @@
  */
 package moe.kcwiki.unpackswf;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,9 +15,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static moe.kcwiki.database.DBCenter.swfSrcPatch;
 import moe.kcwiki.init.GetModifiedDataThread;
+import moe.kcwiki.init.MainServer;
 import moe.kcwiki.picscanner.GetHash;
 import moe.kcwiki.massagehandler.msgPublish;
+import moe.kcwiki.tools.RWFile;
 import moe.kcwiki.tools.constant;
 
 /**
@@ -23,6 +28,10 @@ import moe.kcwiki.tools.constant;
  * @author iTeam_VEP
  */
 public class VerifyScr {
+    private static String rootFolder = MainServer.getTempFolder()+File.separator+"currentswf";
+    private static HashMap<String,Object> fileData = new LinkedHashMap<>();
+    private static String newFile;
+    private static String oldFile;
     
     public boolean verifyscr(String newFileFolder,String oldFileFolder) {
         GetModifiedDataThread.addJob();
@@ -30,6 +39,8 @@ public class VerifyScr {
             @Override
             public void run() {
                 HashMap<String, String> scrDelList = new LinkedHashMap<>();
+                newFile = newFileFolder;
+                oldFile = oldFileFolder;
                 int newScr=0;
                 int oldScr;
                 scrDelList.clear();
@@ -41,9 +52,12 @@ public class VerifyScr {
                         newScr=readNewScr(newFileFolder,scrDelList,newScr);
                         
                         String filename=oldFileFolder.substring(0, oldFileFolder.lastIndexOf(File.separator));
+                        swfSrcPatch.put(newFileFolder.substring(rootFolder.length()+1, newFileFolder.length()), fileData.clone());
+                        fileData.clear();
                         msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr MD5互查对比完成，剩余文件："+(oldScr-newScr),0,0);
                         sleep(1*1000);
                         scrDelList.clear();
+                        //String data = JSON.toJSONString(swfSrcPatch,SerializerFeature.BrowserCompatible);
                     }
                     GetModifiedDataThread.finishJob();
                 } catch (InterruptedException ex) {
@@ -58,14 +72,15 @@ public class VerifyScr {
     
     public static HashMap readOldScr(String filepath,HashMap scrDelList)  {
         File file = new File(filepath);
+        GetHash getHash = new GetHash();
         if (!file.isDirectory()) {
-            scrDelList.put(new GetHash().getNewHash(file.getAbsolutePath()),file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(File.separator)+1, file.getAbsolutePath().length()));
+            scrDelList.put(getHash.getNewHash(file.getAbsolutePath()),file.getAbsolutePath());
         } else if (file.isDirectory()) {
             String[] filelist = file.list();
             for (int i = 0; i < filelist.length; i++) {
                 File readfile = new File(filepath + File.separator + filelist[i]);
                 if (!readfile.isDirectory()) {
-                    scrDelList.put(new GetHash().getNewHash(readfile.getAbsolutePath()),readfile.getAbsolutePath().substring(readfile.getAbsolutePath().lastIndexOf(File.separator)+1, readfile.getAbsolutePath().length()));
+                    scrDelList.put(new GetHash().getNewHash(readfile.getAbsolutePath()),readfile.getAbsolutePath());
                 } else if (readfile.isDirectory()) {
                     scrDelList.putAll(readOldScr(filepath + File.separator + filelist[i],scrDelList));
                 }
@@ -75,29 +90,47 @@ public class VerifyScr {
         return scrDelList;
     }
     
-    public static int readNewScr(String filepath,HashMap scrDelList,int count) {
+    public static int readNewScr(String filepath,HashMap<String,String> scrDelList,int count) {
+        scrdiff srcdiffer = new scrdiff();
         File file = new File(filepath);
+        GetHash getHash = new GetHash();
+        String newFilePath = file.getAbsolutePath();
         if (!file.isDirectory()) {
-            if(scrDelList.get(new GetHash().getNewHash(file.getAbsolutePath()))!=null){
-                new File(file.getAbsolutePath()).delete();
+            if(scrDelList.get(getHash.getNewHash(newFilePath)) != null){
+                new File(newFilePath).delete();
                 count++;
+            }else{
+                String oldFilePath = oldFile + File.separator + newFilePath.substring(newFile.length()+1, newFilePath.length());
+                HashMap tmp = srcdiffer.differ(oldFilePath,newFilePath);
+                if(!tmp.isEmpty())
+                    fileData.put(newFilePath.substring(rootFolder.length()+1, newFilePath.length()), tmp.clone());
             }
         } else if (file.isDirectory()) {
             String[] filelist = file.list();
             for (int i = 0; i < filelist.length; i++) {
                 File readfile = new File(filepath + File.separator + filelist[i]);
                 if (!readfile.isDirectory()) {
-                    String tempfolder=readfile.getAbsolutePath().substring(0,readfile.getAbsolutePath().lastIndexOf(File.separator) );
-                    count=count+delFiles(tempfolder,scrDelList);
+                    newFilePath = readfile.getAbsolutePath();
+                    if(scrDelList.get(getHash.getNewHash(newFilePath)) != null){
+                        new File(newFilePath).delete();
+                        count++;
+                    }else{
+                        String oldFilePath = oldFile + File.separator + newFilePath.substring(newFile.length()+1, newFilePath.length());
+                        HashMap tmp = srcdiffer.differ(oldFilePath,newFilePath);
+                        if(!tmp.isEmpty())
+                            fileData.put(newFilePath.substring(rootFolder.length()+1, newFilePath.length()), tmp.clone());
+                    }
+                    //String tempfolder=readfile.getAbsolutePath().substring(0,readfile.getAbsolutePath().lastIndexOf(File.separator) );
+                    //count=count+delFiles(tempfolder,scrDelList);
+                    
                 } else if (readfile.isDirectory()) {
                     count=readNewScr(filepath + File.separator + filelist[i],scrDelList,count);
                 }
-                
-                if(file.exists()){
-                    File[] fileList = file.listFiles();
-                    if(fileList.length==0){
-                        readfile.delete();
-                    }
+            }
+            if(file.exists()){
+                File[] fileList = file.listFiles();
+                if(fileList.length==0){
+                    file.delete();
                 }
             }
         }
@@ -120,4 +153,16 @@ public class VerifyScr {
         }
         return count;
     }
+    
+    public static void main(String[] args) {
+        MainServer.setTempFolder("C:\\Users\\VEP\\Desktop\\test\\test");
+        rootFolder = MainServer.getTempFolder()+File.separator+"currentswf";
+        try {
+            //new Controller().Analysis("C:\\Users\\VEP\\Desktop\\test\\test\\Core.swf", "C:\\Users\\VEP\\Desktop\\test\\test", "null");
+            new VerifyScr().verifyscr("C:\\Users\\VEP\\Desktop\\test\\test\\currentswf\\new\\scripts", "C:\\Users\\VEP\\Desktop\\test\\test\\currentswf\\old\\scripts");
+        } catch (Exception ex) {
+            Logger.getLogger(VerifyScr.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 }

@@ -55,6 +55,7 @@ public class DBCenter {
     
     public static HashMap<String, String> beforeShipSortNO = new LinkedHashMap<>();  
     public static HashMap<String, JSONObject> JsonPatch = new LinkedHashMap<>();  
+    public static HashMap<String, Object> swfSrcPatch = new LinkedHashMap<>(); 
     
 
     public static boolean reset(){
@@ -99,6 +100,7 @@ public class DBCenter {
         
         beforeShipSortNO.clear();
         JsonPatch.clear();
+        swfSrcPatch.clear();
         return true;
     }
 }

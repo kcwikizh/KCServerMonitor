@@ -74,7 +74,7 @@ public class Controller {
                             for(String oldfile : OldHashList.keySet()){
                                 double score=Scanner.calculateSimilarity(newfile, oldfile);
                                 //if(delList.get(OldHashList.get(oldfile))!=null){continue;}
-                                if(score>0.90){
+                                if(score > 0.90){
                                     new File(NewHashList.get(newfile)).delete();
                                     //delList.put(OldHashList.get(oldfile),oldfile);
                                     //System.out.print(score+constant.LINESEPARATOR);

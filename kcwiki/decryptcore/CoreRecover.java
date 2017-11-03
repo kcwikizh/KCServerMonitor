@@ -74,5 +74,9 @@ public class CoreRecover {
         } catch (IOException e) {
             return false;
         }      
-    }     
+    }
+        
+    public static void main(String[] args) {
+        new CoreRecover().unlockCore("C:\\Users\\VEP\\Desktop\\test\\Core new.swf","C:\\Users\\VEP\\Desktop\\test\\");
+    }
 }

@@ -87,7 +87,13 @@ public class api extends HttpServlet {
                     }
                     String src = request.getParameter("src");
                     String dest = request.getParameter("dest");
+                    String clr = request.getParameter("clearbeforeunpack");
+                    if(clr != null)
+                        new unpackswf().clear(clr);
                     sb.append(new unpackswf().getData(src,dest));
+                    break;
+                case "srcdiff":
+                    sb.append(new srcdiff().getData());
                     break;
                 case "admin":
                     break; 

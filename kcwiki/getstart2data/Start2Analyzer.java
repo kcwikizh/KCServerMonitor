@@ -859,6 +859,7 @@ public class Start2Analyzer {
                     }
                 }
                 ShipgraphDBFlag=true;
+                nBfr.close();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Start2Analyzer.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception ex) {

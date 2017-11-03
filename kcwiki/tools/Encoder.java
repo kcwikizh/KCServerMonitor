@@ -22,7 +22,8 @@ public class Encoder {
  */  
     public static String codeString(String fileName) throws Exception{  
           
-        String charset = "GBK"; // 默认编码
+        //String charset = "GBK"; // 默认编码
+        String charset = "UTF-8"; 
         byte[] first3Bytes = new byte[3];
         try {
             boolean checked = false;

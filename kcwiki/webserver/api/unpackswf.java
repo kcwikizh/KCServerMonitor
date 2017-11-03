@@ -5,8 +5,13 @@
  */
 package moe.kcwiki.webserver.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static moe.kcwiki.tools.constant.LINESEPARATOR;
 import moe.kcwiki.unpackswf.UnpackSwf;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -21,6 +26,21 @@ public class unpackswf {
         this.addString("");
         
         return sb.toString();
+    }
+    
+    public boolean clear(String src) {
+        File folder = new File(src);
+        if(folder.exists()){
+            try {
+                FileUtils.deleteDirectory(folder);
+                if(!folder.exists())
+                    folder.mkdirs();
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(unpackswf.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
     }
     
     public void addData(String str) {
