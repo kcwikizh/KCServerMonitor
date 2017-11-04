@@ -12,14 +12,14 @@ import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import moe.kcwiki.init.MainServer;
+import moe.kcwiki.initializer.MainServer;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
-import moe.kcwiki.massagehandler.msgPublish;
+import moe.kcwiki.handler.massage.msgPublish;
 import org.apache.commons.lang3.StringUtils;
         
 public class DlCore {

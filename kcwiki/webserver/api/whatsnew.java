@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import moe.kcwiki.init.MainServer;
-import static moe.kcwiki.tools.constant.LINESEPARATOR;
+import moe.kcwiki.initializer.MainServer;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
 
 /**
  *

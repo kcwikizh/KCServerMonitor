@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static moe.kcwiki.tools.constant.LINESEPARATOR;
-import moe.kcwiki.unpackswf.UnpackSwf;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
+import moe.kcwiki.swfunpacker.UnpackSwf;
 import org.apache.commons.io.FileUtils;
 
 /**

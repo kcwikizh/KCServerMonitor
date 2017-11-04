@@ -34,15 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import moe.kcwiki.decryptcore.CoreDecrypt;
-import moe.kcwiki.init.MainServer;
-import moe.kcwiki.init.Start2DataThread;
-import moe.kcwiki.massagehandler.msgPublish;
-import moe.kcwiki.threadpool.Controller;
+import moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt;
+import moe.kcwiki.initializer.MainServer;
+import moe.kcwiki.initializer.Start2DataThread;
+import moe.kcwiki.handler.massage.msgPublish;
+import moe.kcwiki.handler.thread.Controller;
 import moe.kcwiki.tools.CalculateDate;
-import static moe.kcwiki.tools.constant.LINESEPARATOR;
-import moe.kcwiki.unpackswf.Server;
-import moe.kcwiki.webserver.WebSocketTest;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
+import moe.kcwiki.swfunpacker.Server;
 import moe.kcwiki.webserver.view.login;
 
 /**
@@ -105,16 +104,16 @@ public class monitor {
             
         } catch (MalformedURLException ex) {
             this.addString("ProxyTest: "+"Error: MalformedURLException");
-            Logger.getLogger(WebSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(monitor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             this.addString("ProxyTest: "+"Error: IOException");
-            Logger.getLogger(WebSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(monitor.class.getName()).log(Level.SEVERE, null, ex);
         }finally {
             try {
                 if(is!=null)
                     is.close();
             } catch (IOException ex) {
-                Logger.getLogger(WebSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(monitor.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
       } else {

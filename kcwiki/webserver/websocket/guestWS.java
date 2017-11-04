@@ -24,10 +24,10 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-import static moe.kcwiki.massagehandler.msgBroadcast.adminmsgbcer;
-import moe.kcwiki.massagehandler.msgPublish;
-import static moe.kcwiki.massagehandler.msgPublish.isAllowPublish;
-import moe.kcwiki.tools.CatchError;
+import static moe.kcwiki.handler.massage.msgBroadcast.adminmsgbcer;
+import moe.kcwiki.handler.massage.msgPublish;
+import static moe.kcwiki.handler.massage.msgPublish.isAllowPublish;
+import moe.kcwiki.tools.daemon.CatchError;
 
 @ServerEndpoint("/guestWS")
 public class guestWS {

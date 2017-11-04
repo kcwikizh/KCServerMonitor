@@ -5,24 +5,24 @@
  */
 package moe.kcwiki.downloader;
 
-import moe.kcwiki.init.Start2DataThread;
-import moe.kcwiki.init.MainServer;
-import moe.kcwiki.init.GetModifiedDataThread;
+import moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt;
+import moe.kcwiki.initializer.Start2DataThread;
+import moe.kcwiki.initializer.MainServer;
+import moe.kcwiki.initializer.GetModifiedDataThread;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import moe.kcwiki.database.*;
-import moe.kcwiki.decryptcore.*;
-import static moe.kcwiki.decryptcore.CoreDecrypt.shipDataList;
-import moe.kcwiki.unpackswf.Server;
-import moe.kcwiki.massagehandler.msgPublish;
-import static moe.kcwiki.massagehandler.msgPublish.mapurlListPublisher;
-import moe.kcwiki.threadpool.Controller;
-import moe.kcwiki.threadpool.corePool;
-import moe.kcwiki.threadpool.start2dataPool;
-import static moe.kcwiki.threadpool.start2dataPool.getTaskNum;
-import moe.kcwiki.tools.constant;
-import static moe.kcwiki.tools.constant.FILESEPARATOR;
+import static moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt.shipDataList;
+import moe.kcwiki.swfunpacker.Server;
+import moe.kcwiki.handler.massage.msgPublish;
+import static moe.kcwiki.handler.massage.msgPublish.mapurlListPublisher;
+import moe.kcwiki.handler.thread.Controller;
+import moe.kcwiki.handler.thread.corePool;
+import moe.kcwiki.handler.thread.start2dataPool;
+import static moe.kcwiki.handler.thread.start2dataPool.getTaskNum;
+import moe.kcwiki.tools.constant.constant;
+import static moe.kcwiki.tools.constant.constant.FILESEPARATOR;
 import org.apache.commons.io.FileUtils;
 
 
@@ -215,7 +215,7 @@ public class DLThread {
             }
             //new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(npath+File.separator+"resources"+File.separator+"swf"+File.separator+"ships");
             msgPublish.msgPublisher("Start2新数据下载完成",0,0);
-            new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
+            new moe.kcwiki.standardization.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
             return taskID;
         }   
         },taskID,"moe.kcwiki.downloader-DLThread-start2");  
@@ -260,7 +260,7 @@ public class DLThread {
                         }
                     }
                     String decompressionFolder = MainServer.getWorksFolder()+File.separator+"maps";
-                    new moe.kcwiki.unpackswf.UnpackSwf().maps(decompressionFolder, rootFolder);
+                    new moe.kcwiki.swfunpacker.UnpackSwf().maps(decompressionFolder, rootFolder);
                     mapurlListPublisher(decompressionFolder);
                     if(CoreDecrypt.mapAddressList.isEmpty()){
                         msgPublish.msgPublisher("数据库中没有新地图信息。",0,-1);

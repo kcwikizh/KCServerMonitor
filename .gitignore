@@ -1,7 +1,5 @@
 kcwiki/webserver/view/admin.java
-kcwiki/webserver/websocket/adminWS.java
-kcwiki/webserver/WebSocketTest.java
-kcwiki/getstart2data/GetStart2.java
+kcwiki/monitor/start2/GetStart2.java
 
 
 #过滤数据库文件、sln解决方案文件、配置文件  

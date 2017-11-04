@@ -7,7 +7,7 @@ package moe.kcwiki.webserver.api;
 
 import com.alibaba.fastjson.JSON;
 import moe.kcwiki.database.DBCenter;
-import static moe.kcwiki.tools.constant.LINESEPARATOR;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
 
 /**
  *

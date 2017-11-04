@@ -5,6 +5,7 @@
  */
 package moe.kcwiki.tools;
 
+import moe.kcwiki.tools.constant.constant;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +19,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
-import moe.kcwiki.massagehandler.msgPublish;
+import moe.kcwiki.handler.massage.msgPublish;
 
 /**
  *

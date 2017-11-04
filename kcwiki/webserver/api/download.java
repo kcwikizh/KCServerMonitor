@@ -6,8 +6,8 @@
 package moe.kcwiki.webserver.api;
 
 import java.io.File;
-import moe.kcwiki.init.MainServer;
-import static moe.kcwiki.tools.constant.LINESEPARATOR;
+import moe.kcwiki.initializer.MainServer;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
 
 /**
  *
