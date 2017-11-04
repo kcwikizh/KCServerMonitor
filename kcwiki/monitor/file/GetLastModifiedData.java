@@ -187,7 +187,7 @@ public class GetLastModifiedData {
         if(nameNo==-1){
             filename=URL.substring(i+1,URL.length());
         }else{
-            filename=moe.kcwiki.swfunpacker.Server.shipvoicerule.get(String.valueOf(nameNo));
+            filename=moe.kcwiki.tools.swfunpacker.Server.shipvoicerule.get(String.valueOf(nameNo));
         }
         String sourcepath=URL.substring(0, i);
         for(int count=0;count<3;count++){
@@ -268,7 +268,7 @@ public class GetLastModifiedData {
                 if(new DlCore().download(URL, filepath+FILESEPARATOR+filename,proxyhost,proxyport)){
                     msgPublish.msgPublisher(filename+"\t下载完成",0,0);
                     if(URL.contains(".swf")){
-                        new moe.kcwiki.swfunpacker.Controller().Analysis(filename,filepath,sourcepath);   
+                        new moe.kcwiki.tools.swfunpacker.Controller().Analysis(filename,filepath,sourcepath);   
                     }
                     return true;
                 }

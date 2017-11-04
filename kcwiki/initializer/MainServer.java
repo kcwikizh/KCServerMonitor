@@ -33,7 +33,7 @@ import org.dtools.ini.*;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.tools.constant.constant;
 import static moe.kcwiki.tools.constant.constant.FILESEPARATOR;
-import static moe.kcwiki.webserver.view.login.setUserList;
+import static moe.kcwiki.web.view.login.setUserList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -198,35 +198,35 @@ public class MainServer {
             }
             
             iniSection = iniFile.getSection("Core");
-            moe.kcwiki.swfunpacker.Server.setCoremap(iniSection.getItem("coreMapArray").getValue());
-            moe.kcwiki.swfunpacker.Server.setCoresound(iniSection.getItem("coreSoundArray").getValue());
+            moe.kcwiki.tools.swfunpacker.Server.setCoremap(iniSection.getItem("coreMapArray").getValue());
+            moe.kcwiki.tools.swfunpacker.Server.setCoresound(iniSection.getItem("coreSoundArray").getValue());
             
             iniSection = iniFile.getSection("Ship");
             for(IniItem item:iniSection){
-                moe.kcwiki.swfunpacker.Server.shiprule.put(item.getName(), item.getValue());
+                moe.kcwiki.tools.swfunpacker.Server.shiprule.put(item.getName(), item.getValue());
             }
             
             iniSection = iniFile.getSection("ShipVoice");
             for(IniItem item:iniSection){
                 if(item.getValue() == null || StringUtils.isBlank(item.getValue()) )
-                    moe.kcwiki.swfunpacker.Server.shipvoicerule.put(item.getName(), "");
+                    moe.kcwiki.tools.swfunpacker.Server.shipvoicerule.put(item.getName(), "");
                 else
-                    moe.kcwiki.swfunpacker.Server.shipvoicerule.put(item.getName(), item.getValue());
+                    moe.kcwiki.tools.swfunpacker.Server.shipvoicerule.put(item.getName(), item.getValue());
             }
             
             iniSection = iniFile.getSection("SlotItem");
             for(IniItem item:iniSection){
                 if(item.getValue() == null || StringUtils.isBlank(item.getValue()) )
-                    moe.kcwiki.swfunpacker.Server.slotitemrule.put(item.getName(), "");
+                    moe.kcwiki.tools.swfunpacker.Server.slotitemrule.put(item.getName(), "");
                 else
-                    moe.kcwiki.swfunpacker.Server.slotitemrule.put(item.getName(), item.getValue());
+                    moe.kcwiki.tools.swfunpacker.Server.slotitemrule.put(item.getName(), item.getValue());
             }
             
             iniSection = iniFile.getSection("userList");
             for(IniItem item:iniSection){
-                moe.kcwiki.webserver.model.userList.userList.put(item.getName(), item.getValue());
+                moe.kcwiki.web.model.userList.userList.put(item.getName(), item.getValue());
             }
-            setUserList(moe.kcwiki.webserver.model.userList.getUserList());
+            setUserList(moe.kcwiki.web.model.userList.getUserList());
             
         } catch (IOException e) {
             msgPublish.msgPublisher(constant.LINESEPARATOR+"程序初始化失败，请检查ini文件是否完整。",0,-1);  
@@ -254,7 +254,7 @@ public class MainServer {
             {
                 if(line.contains("=")){
                     ini=line.split("=");
-                    moe.kcwiki.swfunpacker.Server.seasonrule.put(ini[0],ini[1]);
+                    moe.kcwiki.tools.swfunpacker.Server.seasonrule.put(ini[0],ini[1]);
                 }
             }
             br.close();

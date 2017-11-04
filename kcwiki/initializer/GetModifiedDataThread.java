@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt;
+import moe.kcwiki.tools.swfunpacker.coredecryptor.CoreDecrypt;
 import moe.kcwiki.monitor.file.GetUnkownShip;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.handler.thread.Controller;

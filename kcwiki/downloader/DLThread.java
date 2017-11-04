@@ -5,7 +5,7 @@
  */
 package moe.kcwiki.downloader;
 
-import moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt;
+import moe.kcwiki.tools.swfunpacker.coredecryptor.CoreDecrypt;
 import moe.kcwiki.initializer.Start2DataThread;
 import moe.kcwiki.initializer.MainServer;
 import moe.kcwiki.initializer.GetModifiedDataThread;
@@ -13,8 +13,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import moe.kcwiki.database.*;
-import static moe.kcwiki.swfunpacker.coredecryptor.CoreDecrypt.shipDataList;
-import moe.kcwiki.swfunpacker.Server;
+import static moe.kcwiki.tools.swfunpacker.coredecryptor.CoreDecrypt.shipDataList;
+import moe.kcwiki.tools.swfunpacker.Server;
 import moe.kcwiki.handler.massage.msgPublish;
 import static moe.kcwiki.handler.massage.msgPublish.mapurlListPublisher;
 import moe.kcwiki.handler.thread.Controller;
@@ -215,7 +215,7 @@ public class DLThread {
             }
             //new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(npath+File.separator+"resources"+File.separator+"swf"+File.separator+"ships");
             msgPublish.msgPublisher("Start2新数据下载完成",0,0);
-            new moe.kcwiki.standardization.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
+            new moe.kcwiki.tools.standardization.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
             return taskID;
         }   
         },taskID,"moe.kcwiki.downloader-DLThread-start2");  
@@ -260,7 +260,7 @@ public class DLThread {
                         }
                     }
                     String decompressionFolder = MainServer.getWorksFolder()+File.separator+"maps";
-                    new moe.kcwiki.swfunpacker.UnpackSwf().maps(decompressionFolder, rootFolder);
+                    new moe.kcwiki.tools.swfunpacker.UnpackSwf().maps(decompressionFolder, rootFolder);
                     mapurlListPublisher(decompressionFolder);
                     if(CoreDecrypt.mapAddressList.isEmpty()){
                         msgPublish.msgPublisher("数据库中没有新地图信息。",0,-1);

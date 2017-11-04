@@ -460,7 +460,7 @@ public class GetUnkownShip {
         String publishFolder=MainServer.getPublishFolder()+File.separator+"newShip"+File.separator+shipname;
         String shipFile=rootFolder+File.separator+shipname+".swf";
         
-        new moe.kcwiki.swfunpacker.UnpackSwf().ffdec(publishFolder, shipFile);
+        new moe.kcwiki.tools.swfunpacker.UnpackSwf().ffdec(publishFolder, shipFile);
         
         File[] fileList = new File(publishFolder+File.separator+"images").listFiles();
         if(fileList!=null){
