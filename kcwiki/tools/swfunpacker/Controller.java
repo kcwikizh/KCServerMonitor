@@ -39,10 +39,9 @@ public class Controller {
             filename = "Core_hack.swf";
         }
         //filename = (filename.substring(0, filename.length()-4));
-        msgPublish.msgPublisher(previousfolder+File.separator+filename+"\texists： "+new File(previousfolder+File.separator+filename).exists(),0,0);
         if(new File(previousfolder+File.separator+filename).exists()){
             if(!filename.contains("Core_hack")){
-                msgPublish.msgPublisher(filename+"\t开始解压",0,0);
+                //msgPublish.msgPublisher(filename+"\t开始解压",0,0);
                 ffdec.ffdec(outputpath,filepath+File.separator+filename);
             }
             new VerifyScr().verifyscr(outputpath+File.separator+"scripts", previousfolder+File.separator+filename+File.separator+"scripts");

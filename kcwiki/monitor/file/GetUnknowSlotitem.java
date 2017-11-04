@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import moe.kcwiki.initializer.MainServer;
 import static moe.kcwiki.initializer.MainServer.isStopScanner;
 import moe.kcwiki.handler.massage.msgPublish;
-import static moe.kcwiki.handler.thread.getUnkownSlotitemPool.*;
+import moe.kcwiki.handler.thread.getUnkownSlotitemPool;
 
 /**
  *
@@ -28,6 +28,8 @@ import static moe.kcwiki.handler.thread.getUnkownSlotitemPool.*;
  */
 public class GetUnknowSlotitem {
     private final String slotitemNo;
+    private final String shinkaiSlotitemNo;
+    private final int maxSlotitemNo;
     private final String proxyhost;
     private final int proxyport;
     private static String serveraddress;
@@ -41,9 +43,11 @@ public class GetUnknowSlotitem {
     private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
         
     public GetUnknowSlotitem(){
-        this.proxyhost = moe.kcwiki.initializer.MainServer.getProxyhost();
-        this.proxyport = moe.kcwiki.initializer.MainServer.getProxyport();
-        slotitemNo = moe.kcwiki.initializer.MainServer.getSlotitemno();
+        this.proxyhost = MainServer.getProxyhost();
+        this.proxyport = MainServer.getProxyport();
+        slotitemNo = MainServer.getSlotitemno();
+        shinkaiSlotitemNo = MainServer.getShinkaislotitemno();
+        maxSlotitemNo = 600;
         dataList = new  java.util.ArrayList<>();
         serverAddress();
     }
@@ -63,8 +67,8 @@ public class GetUnknowSlotitem {
     
     public void getUnknowData(){
         
-        final int taskID = getTaskNum();
-            addTask(() -> {
+        final int taskID = getUnkownSlotitemPool.getTaskNum();
+            getUnkownSlotitemPool.addTask(() -> {
                 int no=Integer.valueOf(slotitemNo);
                 
                     while(!isStopScanner()){  
@@ -76,13 +80,15 @@ public class GetUnknowSlotitem {
                             
                         }else{
                             serverAddress();
-                             //msgPublish.msgPublisher("slotitemNo: "+slotitemNo,0,1);
-                            if(no != Integer.valueOf(slotitemNo) && no > 300){
+                            if(no != Integer.valueOf(slotitemNo) && no > maxSlotitemNo){
                                 msgPublish.msgPublisher("扫描到新装备，已下载完毕",0,1);
                                 msgPublish.urlListPublisher(rootFolder+File.separator+"card","newSlotitem");
                                 return taskID;
                             }
                             if(no > 300){
+                                no = Integer.valueOf(shinkaiSlotitemNo);
+                            }
+                            if(no > maxSlotitemNo){
                                 no=Integer.valueOf(slotitemNo);
                                 try{
                                     sleep(60*1000);

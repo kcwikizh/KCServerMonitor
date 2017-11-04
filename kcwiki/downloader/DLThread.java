@@ -5,13 +5,18 @@
  */
 package moe.kcwiki.downloader;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import moe.kcwiki.tools.swfunpacker.coredecryptor.CoreDecrypt;
 import moe.kcwiki.initializer.Start2DataThread;
 import moe.kcwiki.initializer.MainServer;
 import moe.kcwiki.initializer.GetModifiedDataThread;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import moe.kcwiki.database.*;
 import static moe.kcwiki.tools.swfunpacker.coredecryptor.CoreDecrypt.shipDataList;
 import moe.kcwiki.tools.swfunpacker.Server;
@@ -20,10 +25,11 @@ import static moe.kcwiki.handler.massage.msgPublish.mapurlListPublisher;
 import moe.kcwiki.handler.thread.Controller;
 import moe.kcwiki.handler.thread.corePool;
 import moe.kcwiki.handler.thread.start2dataPool;
-import static moe.kcwiki.handler.thread.start2dataPool.getTaskNum;
+import static moe.kcwiki.handler.thread.corePool.getTaskNum;
 import moe.kcwiki.tools.constant.constant;
 import static moe.kcwiki.tools.constant.constant.FILESEPARATOR;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -51,11 +57,14 @@ public class DLThread {
             //MainGui.jProgressBar1.setMaximum(DBCenter.AddressList.size());
             int value=0;
             int fFSum=0;
-            try{
+            
                 for (Map.Entry<String,String> nextAddress : moe.kcwiki.database.DBCenter.AddressList.entrySet()) {
-                    if(nextAddress==null){continue;}
-                    if("".equals(nextAddress.getKey())){continue;}
-
+                    if(nextAddress == null){continue;}
+                    if(nextAddress.getKey()==null){continue;}
+                    if(nextAddress.getValue() == null){continue;}
+                    if(StringUtils.isBlank(nextAddress.getKey())){continue;}
+                    if(StringUtils.isBlank(nextAddress.getValue())){continue;}
+                    
                     if(nextAddress.getKey().contains("/resources/swf/ships")){
                         fileName=nextAddress.getValue();
                         filePath=rootFolder+File.separator+"resources"+File.separator+"swf"+File.separator+"ships";
@@ -164,7 +173,7 @@ public class DLThread {
                     }
                     
                     int reCode=new DlCore().download(nextAddress.getKey(),opPath,filePath,proxyhost,proxyport);
-                    
+                    //msgPublish.msgPublisher("DLThread-当前下载文件：\t"+opPath+"\t"+filePath+"\t"+filePath.substring(rootFolder.length()+1, filePath.length()),0,0);
                     if(reCode==1){ 
                         value++;  
                         if(!opPath.contains(".swf")){
@@ -173,7 +182,14 @@ public class DLThread {
                             //File pubFolder = new File(MainServer.getPublishFolder()+File.separator+relativePath);
                             //FileUtils.copyFileToDirectory(srcFile, pubFolder);
                             File workFolder = new File(MainServer.getWorksFolder()+File.separator+relativePath);
-                            FileUtils.copyFileToDirectory(srcFile, workFolder);
+                            if(!workFolder.exists())
+                                workFolder.mkdirs();
+                            try {
+                                FileUtils.copyFileToDirectory(srcFile, workFolder);
+                            } catch (IOException ex) {
+                                msgPublish.msgPublisher("DLThread-FileUtils-IOException",0,-1);
+                                Logger.getLogger(DLThread.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             //msgPublish.msgPublisher("!swf",0,0);
                             if(opPath.contains("Soubi"+fileName+Server.slotitemrule.get("card")+".png")) {
                                 //msgPublish.msgPublisher("slotitem:"+opPath,0,0);
@@ -209,24 +225,21 @@ public class DLThread {
                     msgPublish.msgPublisher("文件下载失败。",0,0);
                     //JOptionPane.showMessageDialog(null, "文件下载失败。");
                 }
-            }catch (Exception e) {
-                msgPublish.msgPublisher(constant.LINESEPARATOR+"Start2下载线程创建失败。",0,-1);
-                return taskID;
-            }
+            
             //new moe.kcwiki.unpackswf.RenameShipSwf().shipSwf(npath+File.separator+"resources"+File.separator+"swf"+File.separator+"ships");
             msgPublish.msgPublisher("Start2新数据下载完成",0,0);
             new moe.kcwiki.tools.standardization.RenameShipSwf().shipSwf(rootFolder+FILESEPARATOR+"resources"+FILESEPARATOR+"swf"+FILESEPARATOR+"ships");
             return taskID;
         }   
+                
         },taskID,"moe.kcwiki.downloader-DLThread-start2");  
         return isDownloadFinish==true;
     }
     
     //CoreDecrypt
     public boolean modifieddata(String rootFolder,final String ffdecpath,int mode) {
-        //final String opPath=rootFolder;
-        GetModifiedDataThread.addJob();
-        final int taskID = getTaskNum();
+        //final String opPath=rootFolder;;
+        final int taskID = corePool.getTaskNum();
             corePool.addTask(new Callable<Integer>() {
                 @Override
                 public Integer call() {
@@ -237,6 +250,10 @@ public class DLThread {
 
                     for (Map.Entry<String,String> nextAddress : CoreDecrypt.mapAddressList.entrySet()) {
                         if(nextAddress==null){continue;}
+                        if(nextAddress.getKey()==null){continue;}
+                        if(nextAddress.getValue()==null){continue;}
+                        if(StringUtils.isBlank(nextAddress.getKey())){continue;}
+                        if(StringUtils.isBlank(nextAddress.getValue())){continue;}
                         if(!nextAddress.getKey().contains("/resources/swf/map")){continue;}
                         String opPath=rootFolder+File.separator+nextAddress.getValue();
                         try{
@@ -260,13 +277,12 @@ public class DLThread {
                         }
                     }
                     String decompressionFolder = MainServer.getWorksFolder()+File.separator+"maps";
-                    new moe.kcwiki.tools.swfunpacker.UnpackSwf().maps(decompressionFolder, rootFolder);
-                    mapurlListPublisher(decompressionFolder);
                     if(CoreDecrypt.mapAddressList.isEmpty()){
-                        msgPublish.msgPublisher("数据库中没有新地图信息。",0,-1);
+                        msgPublish.msgPublisher("数据库中没有新地图信息。",0,0);
                     }else{
                         msgPublish.msgPublisher("地图数据下载完成",0,1);
-                        GetModifiedDataThread.finishJob();
+                        new moe.kcwiki.tools.swfunpacker.UnpackSwf().maps(decompressionFolder, rootFolder);
+                        mapurlListPublisher(decompressionFolder);
                     }
                     return taskID;
                 }
@@ -278,9 +294,16 @@ public class DLThread {
                     for (Map.Entry<String,String> nextAddress : CoreDecrypt.shipAddressList.entrySet()) {
                         //msgPublish.msgPublisher("shipAddressList"+nextAddress.getKey(),0,0);
                         if(nextAddress==null){continue;}
+                        if(nextAddress.getKey()==null){continue;}
+                        if(nextAddress.getValue()==null){continue;}
+                        if(StringUtils.isBlank(nextAddress.getKey())){continue;}
+                        if(StringUtils.isBlank(nextAddress.getValue())){continue;}
                         if(!nextAddress.getKey().contains("/sound/kc")){continue;}
                         //String shipdata=shipDataList.get(nextAddress.getValue());
-                        Ship ship=moe.kcwiki.database.DBCenter.NewShipDB.get(shipDataList.get(nextAddress.getKey()));
+                        Ship ship=moe.kcwiki.database.DBCenter.ShipDB.get(shipDataList.get(nextAddress.getKey()));
+                        if(ship == null)
+                            continue;
+                        //msgPublish.msgPublisher("当前下载文件：\t nextAddress.getKey()\t"+nextAddress.getKey()+"\t"+ship.getApi_id()+"\t"+ship.getApi_name()+"\t"+ship.getApi_filename(),0,-1);
                         String filepath=ship.getApi_filename()+"-"+ship.getApi_name();
                         String filename=nextAddress.getValue();
                         filename=Server.shipvoicerule.get(filename);
@@ -309,7 +332,6 @@ public class DLThread {
                     }
                     if(!CoreDecrypt.shipAddressList.isEmpty()){
                         msgPublish.msgPublisher("语音数据下载完成",0,1);
-                        GetModifiedDataThread.finishJob();
                     }
                     return taskID;
                 } 

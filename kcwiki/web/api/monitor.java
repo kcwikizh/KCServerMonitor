@@ -144,9 +144,13 @@ public class monitor {
         this.addString("getProxyhost: "+MainServer.getProxyhost());
         this.addString("getProxyport: "+MainServer.getProxyport());
         this.addString("getSlotitemno: "+MainServer.getSlotitemno());
+        this.addString("getShinkaislotitemno: "+MainServer.getShinkaislotitemno());
+        this.addString("getDutyno: "+MainServer.getDutyno());
         this.addString("getMapid: "+MainServer.getMapid());
         this.addString("getCoremap: "+Server.getCoremap());
         this.addString("getCoresound: "+Server.getCoresound());
+        this.addString("getAuthorization_superuser: "+(MainServer.getAuthorization_superuser() != null));
+        this.addString("getAuthorization_uploadstart2: "+(MainServer.getAuthorization_uploadstart2()!= null));
       } else {
         this.addString("Server is not been inited.");
       }
@@ -159,6 +163,13 @@ public class monitor {
       }
       this.addString("getWorldListSize: " + worldMap.size());
       
+      if(moe.kcwiki.database.DBCenter.AddressList != null){
+          moe.kcwiki.database.DBCenter.AddressList.keySet().forEach((_item) -> {
+          this.addString("AddressList: "+_item+":\t"+moe.kcwiki.database.DBCenter.AddressList.get(_item));
+        });
+      }else{
+          this.addString("AddressList:  null!");
+      }
       this.addString("AddressList.size(): " + moe.kcwiki.database.DBCenter.AddressList.size());
       
       List UrlList = msgPublish.getUrlList();
@@ -173,12 +184,21 @@ public class monitor {
         });
       this.addString("getUrlprePublishList: " + UrlprePublishList.size());
       
-      if(CoreDecrypt.shipAddressList != null){
+      /*if(CoreDecrypt.shipAddressList != null){
           CoreDecrypt.shipAddressList.keySet().forEach((_item) -> {
           this.addString("shipVioceAddressList: "+JSON.toJSONString(_item));
         });
       }else{
           this.addString("shipVioceAddressList:  null!");
+      }
+      this.addString("shipVioceAddressList.size(): "+CoreDecrypt.shipAddressList.size());*/
+      
+      if(CoreDecrypt.shipDataList != null){
+          CoreDecrypt.shipDataList.keySet().forEach((_item) -> {
+          this.addString("shipDataList: "+_item+":\t"+CoreDecrypt.shipDataList.get(_item));
+        });
+      }else{
+          this.addString("shipDataList:  null!");
       }
       this.addString("shipVioceAddressList.size(): "+CoreDecrypt.shipAddressList.size());
       

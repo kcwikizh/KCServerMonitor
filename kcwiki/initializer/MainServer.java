@@ -46,6 +46,27 @@ import org.apache.commons.lang3.StringUtils;
 public class MainServer {
 
     /**
+     * @return the shinkaislotitemno
+     */
+    public static String getShinkaislotitemno() {
+        return shinkaislotitemno;
+    }
+
+    /**
+     * @return the Authorization_superuser
+     */
+    public static String getAuthorization_superuser() {
+        return Authorization_superuser;
+    }
+
+    /**
+     * @return the Authorization_uploadstart2
+     */
+    public static String getAuthorization_uploadstart2() {
+        return Authorization_uploadstart2;
+    }
+
+    /**
      * @param aLocaloldstart2 the localoldstart2 to set
      */
     public static void setLocaloldstart2(String aLocaloldstart2) {
@@ -69,9 +90,13 @@ public class MainServer {
     private static String localoldstart2; 
     private static String mapid;  
     private static String slotitemno;
+    private static String shinkaislotitemno;
+    private static String dutyno;
     private static String seasonini;
     private static String KcUser;
     private static String KcPassword;
+    private static String Authorization_superuser = null;
+    private static String Authorization_uploadstart2 = null;
     private static boolean DebugMode = false;
     private static boolean stopScanner = false;
     private static boolean init = false;
@@ -165,6 +190,8 @@ public class MainServer {
             }
             MainServer.mapid = iniSection.getItem("MapId").getValue(); 
             MainServer.slotitemno = iniSection.getItem("slotitemNo").getValue(); 
+            MainServer.shinkaislotitemno = iniSection.getItem("shinkaiSlotitemNo").getValue(); 
+            MainServer.dutyno = iniSection.getItem("dutyNO").getValue(); 
             MainServer.newstart2 = iniSection.getItem("newStart2").getValue(); 
             MainServer.oldstart2 = iniSection.getItem("oldStart2").getValue();
             MainServer.seasonini = iniSection.getItem("seasonIni").getValue(); 
@@ -227,6 +254,10 @@ public class MainServer {
                 moe.kcwiki.web.model.userList.userList.put(item.getName(), item.getValue());
             }
             setUserList(moe.kcwiki.web.model.userList.getUserList());
+            
+            iniSection = iniFile.getSection("Authorization");
+            MainServer.Authorization_superuser = iniSection.getItem("superuser").getValue(); 
+            MainServer.Authorization_uploadstart2 = iniSection.getItem("uploadstart2").getValue(); 
             
         } catch (IOException e) {
             msgPublish.msgPublisher(constant.LINESEPARATOR+"程序初始化失败，请检查ini文件是否完整。",0,-1);  
@@ -627,5 +658,12 @@ public class MainServer {
      */
     public static List<String> getWorldList() {
         return worldList;
+    }
+
+    /**
+     * @return the dutyno
+     */
+    public static String getDutyno() {
+        return dutyno;
     }
 }

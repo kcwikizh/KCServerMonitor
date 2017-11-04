@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import moe.kcwiki.initializer.MainServer;
 import static moe.kcwiki.initializer.MainServer.isStopScanner;
 import moe.kcwiki.handler.massage.msgPublish;
+import moe.kcwiki.handler.thread.getUnkownShipPool;
 import static moe.kcwiki.handler.thread.getUnkownShipPool.*;
 import moe.kcwiki.tools.GetHash;
 import moe.kcwiki.tools.constant.constant;
@@ -303,8 +304,8 @@ public class GetUnkownShip {
         }
         */
         
-        final int taskID = getTaskNum();
-        addTask(new Callable<Integer>() {
+        final int taskID = getUnkownShipPool.getTaskNum();
+        getUnkownShipPool.addTask(new Callable<Integer>() {
                 @Override
                 public Integer call() {
                         GetUnkownShip rename=new GetUnkownShip();
@@ -320,10 +321,11 @@ public class GetUnkownShip {
                                     if (getMDD("http://"+serveraddress+"/kcs/"+data.getString("path"),data.getLong("timestamp"))) {
                                         it.remove();
                                         String filename=data.getString("filename");
-                                        msgPublish.msgPublisher("当前尝试立绘文件： "+data.getString("id")+"\t"+"http://"+serveraddress+"/kcs/"+data.getString("path"),0,0);
                                         if(md5DataSet.contains(Hash.getNewHash(rootFolder+File.separator+filename+".swf"))){
                                             continue;
                                         }
+                                        msgPublish.msgPublisher("立绘文件： "+data.getString("id")+"\t"+"http://"+serveraddress+"/kcs/"+data.getString("path"),0,0);
+                                        msgPublish.msgPublisher("立绘HASH： "+Hash.getNewHash(rootFolder+File.separator+filename+".swf"),0,0);
                                         rename.renameShipSwf(filename);
                                     }
                                 } catch (InterruptedException ex) {

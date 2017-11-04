@@ -56,6 +56,7 @@ public class start2dataPool {
         if(!isIsInit()){
             return;
         }
+        //msgPublish.msgPublisher("start2dataPool-takeTask反馈消息： "+taskID+taskName+"\t添加任务",0,1);
         cs.submit(task);
         taskList.put(taskID, taskName);
         taskNum.getAndIncrement();
@@ -99,18 +100,22 @@ public class start2dataPool {
     
     public static boolean takeTask(){
                 for(int taskid=0;taskid<taskNum.get();){
+                    String name = taskList.get(taskid);
                     try {
                         Future<Integer> task=cs.take();
                         if(task.get()!= null ){
-                            msgPublish.msgPublisher("start2dataPool-takeTask反馈消息： "+taskList.get(task.get())+"\t运行结束",0,1);
+                            msgPublish.msgPublisher("start2dataPool-takeTask反馈消息： "+taskList.get(taskid)+"\t运行结束",0,1);
                             taskid++; 
                         }
                     } catch (InterruptedException ex) {
-                        msgPublish.msgPublisher("start2dataPool-takeTask 发生InterruptedException错误",0,-1);
+                        msgPublish.msgPublisher("start2dataPool-takeTask "+name+"发生InterruptedException错误",0,-1);
                         Logger.getLogger(start2dataPool.class.getName()).log(Level.SEVERE, null, ex);
                         taskid++;
                     } catch (ExecutionException ex) {
-                        msgPublish.msgPublisher("start2dataPool-takeTask 发生ExecutionException错误",0,-1);
+                        msgPublish.msgPublisher("start2dataPool-takeTask "+name+"发生ExecutionException错误",0,-1);
+                        msgPublish.msgPublisher("具体信息为： ",0,-1);
+                        msgPublish.msgPublisher("getMessage "+name+"发生"+ex.getMessage().toString()+"错误",0,-1);
+                        msgPublish.msgPublisher("getStackTrace "+name+"发生"+org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(ex),0,-1);
                         Logger.getLogger(start2dataPool.class.getName()).log(Level.SEVERE, null, ex);
                         taskid++;
                     }

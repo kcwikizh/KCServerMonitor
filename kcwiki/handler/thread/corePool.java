@@ -84,18 +84,22 @@ public class corePool {
         if(!taskMonitorOnline){
             taskMonitorOnline = true;
             for(int taskid=0;taskid<taskNum.get();){
+                String name = taskList.get(taskid);
                 try {
                     Future<Integer> task=cs.take();
                     if(task.get() != null){
-                        msgPublish.msgPublisher("corePool-takeTask反馈消息： "+taskList.get(task.get())+"\t运行结束",0,1);
+                        msgPublish.msgPublisher("corePool-takeTask反馈消息： "+name+"\t运行结束",0,1);
                         taskid++; 
                     }
                 } catch (InterruptedException ex) {
-                    msgPublish.msgPublisher("corePool-takeTask反馈消息： 某线程发生InterruptedException错误",0,-1);
+                    msgPublish.msgPublisher("corePool-takeTask反馈消息： "+name+"发生InterruptedException错误",0,-1);
                     Logger.getLogger(corePool.class.getName()).log(Level.SEVERE, null, ex);
                     taskid++;
                 } catch (ExecutionException ex) {
-                    msgPublish.msgPublisher("corePool-takeTask反馈消息： 某线程发生ExecutionException错误",0,-1);
+                    msgPublish.msgPublisher("corePool-takeTask反馈消息： "+name+"发生ExecutionException错误",0,-1);
+                    msgPublish.msgPublisher("具体信息为： ",0,-1);
+                    msgPublish.msgPublisher("getMessage "+name+"发生"+ex.getMessage().toString()+"错误",0,-1);
+                    msgPublish.msgPublisher("getStackTrace "+name+"发生"+org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(ex),0,-1);
                     Logger.getLogger(corePool.class.getName()).log(Level.SEVERE, null, ex);
                     taskid++;
                 }

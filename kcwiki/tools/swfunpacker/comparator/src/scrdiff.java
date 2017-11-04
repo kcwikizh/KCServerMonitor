@@ -11,12 +11,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import moe.kcwiki.database.DBCenter;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.tools.Encoder;
+import static moe.kcwiki.tools.constant.constant.LINESEPARATOR;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
@@ -24,10 +28,13 @@ import org.apache.commons.codec.digest.DigestUtils;
  * @author VEP
  */
 public class scrdiff {
-    public HashMap differ(String oldFile,String newFile){
+    
+    public ArrayList differ(String oldFile,String newFile){
         HashMap<String,String> oldFileData = new LinkedHashMap<>();
-        HashMap<String,String> diffData = new LinkedHashMap<>();
+        ArrayList<String> diffData = new ArrayList<>();
         BufferedReader nBfr = null;
+        List<String> lines = new ArrayList<>();
+        
         try {
             if(!oldFile.contains(".as") || !newFile.contains(".as")) return diffData;
             String line;
@@ -37,12 +44,12 @@ public class scrdiff {
                     oldFileData.put(getHash(line), line);
                 }
             }
+            
             nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(new File(newFile)), Encoder.codeString(newFile)));
-            int count = 0;
             while((line=nBfr.readLine())!=null){
-                count++;
+                lines.add(line);
                 if(!oldFileData.containsKey(getHash(line))){
-                   diffData.put(getHash(line), line); 
+                   diffData.add(line); 
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -51,10 +58,31 @@ public class scrdiff {
             Logger.getLogger(scrdiff.class.getName()).log(Level.SEVERE, null, ex);
         }
         if(newFile.contains("DutyConst")){
-            JSON.toJSONString(diffData);
-            return diffData;
+            //DBCenter.dutyData = JSON.parseObject(sb.toString());
+            dutydiffer(lines);
         }
         return diffData;
+    }
+    
+    public boolean dutydiffer(List<String> lines) {
+        StringBuilder sb = new StringBuilder();
+        boolean isRecord = false;
+        for(String line : lines) {
+            if(line.contains("public static const") && line.contains("Object")) {
+                isRecord = true;
+                sb.append("{");
+                continue;
+            }
+            if(line.contains("};") && isRecord) {
+                isRecord = false;
+                sb.append("}");
+                break;
+            }
+            if(isRecord)
+                sb.append(line);
+        }
+        DBCenter.dutyData = JSON.parseObject(sb.toString());
+        return true;
     }
     
     public String getHash(String str) {

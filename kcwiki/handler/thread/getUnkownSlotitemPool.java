@@ -86,25 +86,29 @@ public class getUnkownSlotitemPool  {
     }
     
     public static boolean takeTask(){
-        final int taskID = corePool.getTaskNum();
+        final int taskID = modifieddataPool.getTaskNum();
         modifieddataPool.addTask(new Callable<Integer>() {
             @Override
             public Integer call() {
                 for(int taskid=0;taskid<taskNum.get();){
+                    String name = taskList.get(taskid);
                     try {
                         Future<Integer> task=cs.take();
                         if(task.get() != null){
-                            msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask反馈消息： "+taskList.get(task.get())+"\t运行结束",0,1);
+                            msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask反馈消息： "+taskList.get(taskid)+"\t运行结束",0,1);
                             taskid++;
                         }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(getUnkownSlotitemPool.class.getName()).log(Level.SEVERE, null, ex);
-                        msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask 已强制退出。",0,0);
+                        msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask "+name+"已强制退出。",0,0);
                         shutdownNow();
                         return taskID;
                     } catch (ExecutionException ex) {
                         Logger.getLogger(getUnkownSlotitemPool.class.getName()).log(Level.SEVERE, null, ex);
-                        msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask 发生ExecutionException错误。",0,0);
+                        msgPublish.msgPublisher("getUnkownSlotitemPool-takeTask "+name+"发生ExecutionException错误。",0,0);
+                        msgPublish.msgPublisher("具体信息为： ",0,-1);
+                        msgPublish.msgPublisher("getMessage "+name+"发生"+ex.getMessage().toString()+"错误",0,-1);
+                        msgPublish.msgPublisher("getStackTrace "+name+"发生"+org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(ex),0,-1);
                         shutdownNow();
                         return taskID;
                     }

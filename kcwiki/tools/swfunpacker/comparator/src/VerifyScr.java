@@ -7,8 +7,10 @@ package moe.kcwiki.tools.swfunpacker.comparator.src;
 
 import java.io.File;
 import static java.lang.Thread.sleep;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static moe.kcwiki.database.DBCenter.swfSrcPatch;
@@ -16,6 +18,7 @@ import moe.kcwiki.initializer.GetModifiedDataThread;
 import moe.kcwiki.initializer.MainServer;
 import moe.kcwiki.tools.swfunpacker.comparator.image.GetHash;
 import moe.kcwiki.handler.massage.msgPublish;
+import moe.kcwiki.web.api.srcdiff;
 
 /**
  *
@@ -50,7 +53,8 @@ public class VerifyScr {
                     msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr MD5互查对比完成，剩余文件："+(oldScr-newScr),0,0);
                     scrDelList.clear();
                     //String data = JSON.toJSONString(swfSrcPatch,SerializerFeature.BrowserCompatible);
-                }    
+                }
+                //new srcdiff().getData();
             }
         }.start();
         return true;
@@ -87,7 +91,7 @@ public class VerifyScr {
                 count++;
             }else{
                 String oldFilePath = oldFile + File.separator + newFilePath.substring(newFile.length()+1, newFilePath.length());
-                HashMap tmp = srcdiffer.differ(oldFilePath,newFilePath);
+                ArrayList tmp = srcdiffer.differ(oldFilePath,newFilePath);
                 if(!tmp.isEmpty())
                     fileData.put(newFilePath.substring(rootFolder.length()+1, newFilePath.length()), tmp.clone());
             }
@@ -102,7 +106,7 @@ public class VerifyScr {
                         count++;
                     }else{
                         String oldFilePath = oldFile + File.separator + newFilePath.substring(newFile.length()+1, newFilePath.length());
-                        HashMap tmp = srcdiffer.differ(oldFilePath,newFilePath);
+                        ArrayList<String> tmp = srcdiffer.differ(oldFilePath,newFilePath);
                         if(!tmp.isEmpty())
                             fileData.put(newFilePath.substring(rootFolder.length()+1, newFilePath.length()), tmp.clone());
                     }
@@ -139,15 +143,15 @@ public class VerifyScr {
         return count;
     }
     
-    /*public static void main(String[] args) {
-        MainServer.setTempFolder("C:\\Users\\VEP\\Desktop\\test\\test");
+    public static void main(String[] args) {
+        MainServer.setTempFolder("C:\\Users\\iTeam_VEP\\Desktop\\tset\\test");
         rootFolder = MainServer.getTempFolder()+File.separator+"currentswf";
         try {
             //new Controller().Analysis("C:\\Users\\VEP\\Desktop\\test\\test\\Core.swf", "C:\\Users\\VEP\\Desktop\\test\\test", "null");
-            new VerifyScr().verifyscr("C:\\Users\\VEP\\Desktop\\test\\test\\currentswf\\new\\scripts", "C:\\Users\\VEP\\Desktop\\test\\test\\currentswf\\old\\scripts");
+            new VerifyScr().verifyscr("C:\\Users\\iTeam_VEP\\Desktop\\tset\\test\\currentswf\\new\\scripts", "C:\\Users\\iTeam_VEP\\Desktop\\tset\\test\\currentswf\\old\\scripts");
         } catch (Exception ex) {
             Logger.getLogger(VerifyScr.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }*/
+    }
     
 }

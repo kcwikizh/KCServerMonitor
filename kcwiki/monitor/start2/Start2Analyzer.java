@@ -1101,13 +1101,17 @@ public class Start2Analyzer {
                 for( Map.Entry<String,SlotItem> map : DBCenter.NewSlotitemDB.entrySet()){
                     if(map.getKey()==null){continue;}
                     nData = map.getValue().getApi_id();
-                    wikiID = map.getValue().getApi_sortno();
+                    if(Integer.valueOf(nData) > 500){
+                        wikiID = map.getValue().getApi_id();
+                    } else {
+                        wikiID = map.getValue().getApi_sortno();
+                    }
                     //if(Integer.parseInt(map.getValue().getApi_id())>499){continue;}
-                    if(Integer.parseInt(map.getValue().getApi_id())<100){
+                    if(Integer.parseInt(nData)<100){
                         nData = "0" + map.getValue().getApi_id();
                         wikiID = "0" + map.getValue().getApi_sortno();
                     }
-                    if(Integer.parseInt(map.getValue().getApi_id())<10){
+                    if(Integer.parseInt(nData)<10){
                         nData = "00" + map.getValue().getApi_id();
                         wikiID = "00" + map.getValue().getApi_sortno();
                     }

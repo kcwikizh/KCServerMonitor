@@ -226,6 +226,9 @@ public class RenameShipSwf {
     private boolean copyToPublish(String filepath,String filename){
         try {
             //msgPublish.msgPublisher("copyToPublish:"+filepath+"\t"+MainServer.getPublishFolder()+FILESEPARATOR+"ship"+FILESEPARATOR+filename,0, -1);
+            File publishFolder = new File(MainServer.getPublishFolder()+FILESEPARATOR+"ship");
+            if(!publishFolder.exists())
+                publishFolder.mkdirs();
             FileUtils.copyFile(new File(filepath),new File(MainServer.getPublishFolder()+FILESEPARATOR+"ship"+FILESEPARATOR+filename));
             
             return true;

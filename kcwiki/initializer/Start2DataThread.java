@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import moe.kcwiki.tools.compressor.ZipCompressor;
 import moe.kcwiki.handler.massage.msgPublish;
+import static moe.kcwiki.handler.massage.msgPublish.getUrlprePublishList;
 import moe.kcwiki.handler.thread.Controller;
 import moe.kcwiki.handler.thread.start2dataPool;
 import moe.kcwiki.tools.constant.constant;
@@ -55,20 +56,26 @@ public class Start2DataThread {
                         
                         sleep(30*1000);
                         start2dataPool.takeTask();
-                        msgPublish.msgPublisher("准备执行-等待start2dataPool关闭操作-操作。",0,0);
+                        msgPublish.msgPublisher("等待start2dataPool关闭中",0,0);
                         while(!start2dataPool.isTerminated()){
                             sleep(10*1000);
                         }
                         msgPublish.msgPublisher("准备执行-关闭所有线程池-操作。",0,0);
                         Controller.getInstance().shutdown();
                         //new moe.kcwiki.unpackswf.UnpackSwf().unpackStart2(MainServer.getTempFolder()+FILESEPARATOR+"unpackswf"+FILESEPARATOR+"kcs",MainServer.getDownloadFolder()+FILESEPARATOR+"resources");
-                        msgPublish.urlOnPublisher();
+                        if(!getUrlprePublishList().isEmpty()){
+                            msgPublish.urlOnPublisher();
+                        }
                         long date = new Date().getTime();
                         String tempZipFolder = MainServer.getPublishFolder()+FILESEPARATOR+date;
                         ZipCompressor.createZip(MainServer.getDownloadFolder(), tempZipFolder, "sourcefile.zip");
                         ZipCompressor.createZip(MainServer.getWorksFolder(), tempZipFolder, "editorialfile.zip");
                         ZipCompressor.createZip(MainServer.getLogFolder(), tempZipFolder, "logfile.zip");
-                        ZipCompressor.createZip(tempZipFolder, MainServer.getMuseumFolder(), date+".zip");
+                        if(MainServer.isDebugMode()){
+                            ZipCompressor.createZip(tempZipFolder, MainServer.getMuseumFolder(), date+"-debug.zip");
+                        } else {
+                            ZipCompressor.createZip(tempZipFolder, MainServer.getMuseumFolder(), date+".zip");
+                        }
                         MainServer.setZipFolder(date);
                         msgPublish.msgPublisher(new Date() +LINESEPARATOR+"获取新数据\t主线程运行结束",0,1);
                         //MainGui.btnctl(2,true);

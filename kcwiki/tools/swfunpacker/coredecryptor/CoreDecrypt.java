@@ -27,7 +27,7 @@ import moe.kcwiki.database.*;
 import moe.kcwiki.initializer.Start2DataThread;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.handler.thread.corePool;
-import static moe.kcwiki.handler.thread.start2dataPool.getTaskNum;
+import static moe.kcwiki.handler.thread.corePool.getTaskNum;
 import moe.kcwiki.tools.Encoder;
 import moe.kcwiki.tools.constant.constant;
 
@@ -59,7 +59,7 @@ public class CoreDecrypt {
     
     public boolean getData(String map,String sound){
         GetModifiedDataThread.addJob();
-        final int taskID = getTaskNum();
+        final int taskID = corePool.getTaskNum();
             corePool.addTask(new Callable<Integer>() {
                 @Override
                 public Integer call() {

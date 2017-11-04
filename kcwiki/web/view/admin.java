@@ -109,7 +109,7 @@ public class admin extends HttpServlet{
                     //new moe.kcwiki.unpackswf.UnpackSwf().callShell("service tomcat8 restart");
                     break;
                 case "shutdown":
-                    if(request.getParameter("Authorizations-key") != null &&request.getParameter("Authorizations-key").equals("iamROOT")){
+                    if(request.getParameter("Authorizations-key") != null && request.getParameter("Authorizations-key").equals(MainServer.getAuthorization_superuser())){
                         System.exit(0);
                     }
                     break;
