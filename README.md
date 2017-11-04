@@ -13,4 +13,4 @@ The Java code which log in to the <font color="#1E90FF"><b>C2 servers</b></font>
 </br>
 
 For more information please view the <font color="#1E90FF"><b><a href="https://github.com/kcwikizh/KCServerMonitor/wiki">wiki</a></b></font>.
-</br>代码详细说明请看wiki。
+</br>程序对外提供的接口详细说明请看wiki。
