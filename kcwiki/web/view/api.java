@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import moe.kcwiki.initializer.MainServer;
+import moe.kcwiki.web.api.imgdiff;
 
 /**
  *
@@ -71,6 +73,13 @@ public class api extends HttpServlet {
                     sb.append(new jsonpatch().getData());
                     break; 
                 case "unpackswf":
+                    //kcs
+                    //http://45.56.95.241:7000/KcWikiOnline/api?query=unpackswf&src=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/download/kcs&dest=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/previousswf
+                    //kcs/scenes
+                    //http://45.56.95.241:7000/KcWikiOnline/api?query=unpackswf&src=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/download/kcs/scenes&dest=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/previousswf
+                    //core.swf
+                    //http://45.56.95.241:7000/KcWikiOnline/api?query=unpackswf&src=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/temp/Core_hack.swf&dest=/var/lib/tomcat8/webapps/KcWikiOnline/WEB-INF/custom/previousswf
+                    
                     if(session==null || session.getAttribute("hsaLogin")!="true"){
                         data.put("status", "failure");
                         data.put("data", "请登录后再进行此操作。");
@@ -86,7 +95,11 @@ public class api extends HttpServlet {
                 case "srcdiff":
                     sb.append(new srcdiff().getData());
                     break;
+                case "imgdiff":
+                    sb.append(new imgdiff().getData());
+                    break;
                 case "admin":
+                    MainServer.getWorldlist();
                     break; 
                 case "null":
                     sb.append(request.getScheme()).append("://").append(request.getServerName()).append(":").append(request.getServerPort());

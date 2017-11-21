@@ -27,8 +27,6 @@ public class Start2DataThread {
     private Thread Start2DataThread;
     //private static boolean isFinish=false;
     private static boolean hasStart2=false;
-    private static int Threadcounter=0;
-    private static int counter=0;
     
     public synchronized boolean StartThread(){
         
@@ -42,7 +40,8 @@ public class Start2DataThread {
                     if(MainServer.isDebugMode()){
                         new moe.kcwiki.monitor.start2.Start2Analyzer().ReadNewFile(null);
                     }else if(!new moe.kcwiki.monitor.start2.GetStart2().netStart()){
-                        msgPublish.msgPublisher("netStart运行出错，已停止GetStart2\t子线程运行。",0,1);
+                        msgPublish.msgPublisher("netStart运行出错，已停止GetStart2\t子线程运行。",0,-1);
+                        start2dataPool.setIsOnline(false);
                         return;
                     }
                         msgPublish.msgPublisher("hasStart2:"+hasStart2,0,0);
@@ -66,7 +65,7 @@ public class Start2DataThread {
                         if(!getUrlprePublishList().isEmpty()){
                             msgPublish.urlOnPublisher();
                         }
-                        long date = new Date().getTime();
+                        long date = MainServer.getDate();
                         String tempZipFolder = MainServer.getPublishFolder()+FILESEPARATOR+date;
                         ZipCompressor.createZip(MainServer.getDownloadFolder(), tempZipFolder, "sourcefile.zip");
                         ZipCompressor.createZip(MainServer.getWorksFolder(), tempZipFolder, "editorialfile.zip");
@@ -95,14 +94,6 @@ public class Start2DataThread {
         };
         Start2DataThread.start();
         return true;
-    }
-      
-    public static void addJob(){
-        Threadcounter++;
-    }
-    
-    public synchronized static void finishJob(){
-        counter++;
     }
     
     public synchronized boolean StopThread(){

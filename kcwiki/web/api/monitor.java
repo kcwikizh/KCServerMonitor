@@ -27,6 +27,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -156,12 +157,20 @@ public class monitor {
       }
       
       this.addString(LINESEPARATOR);
+      String[] serverlistname = new String[]{"0","横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
+    
       this.addString("各项实时数据： ");
       HashMap<String,String> worldMap = MainServer.getWorldMap();
       for(String id:worldMap.keySet()) {
-          this.addString("id: " + id + "\t ip: " + worldMap.get(id));
+          this.addString("servername: " + serverlistname[Integer.valueOf(id)] + "\t ip: " + worldMap.get(id));
       }
-      this.addString("getWorldListSize: " + worldMap.size());
+      this.addString("getWorldMapSize: " + worldMap.size());
+      
+      ArrayList<String> worldList = MainServer.getWorldList();
+      for(String ip:worldList) {
+          this.addString("ip: " + ip);
+      }
+      this.addString("getWorldListSize: " + worldList.size());
       
       if(moe.kcwiki.database.DBCenter.AddressList != null){
           moe.kcwiki.database.DBCenter.AddressList.keySet().forEach((_item) -> {

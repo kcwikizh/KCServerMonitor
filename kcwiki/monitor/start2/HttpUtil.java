@@ -177,8 +177,8 @@ public class HttpUtil {
 		cookieStore = new BasicCookieStore();
 		//构建客户端
 		client= HttpClientBuilder.create().setDefaultCookieStore(cookieStore).setConnectionManager(connManager).build();
-                HttpHost proxy = new HttpHost(MainServer.getProxyhost(), MainServer.getProxyport());   //代理设置
-                //HttpHost proxy = new HttpHost("127.0.0.1", 1090);
+                //HttpHost proxy = new HttpHost(MainServer.getProxyhost(), MainServer.getProxyport());   //代理设置
+                HttpHost proxy = new HttpHost("127.0.0.1", 8123);
 		config = RequestConfig.custom().setProxy(proxy).setRedirectsEnabled(true).build();  //配置文件：设置代理，开启get重定向自动跳转
 	}
 

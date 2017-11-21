@@ -23,6 +23,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,6 +45,13 @@ import org.apache.commons.lang3.StringUtils;
 
 //http://www.cnblogs.com/younggun/archive/2013/12/12/3470821.html
 public class MainServer {
+
+    /**
+     * @return the date
+     */
+    public static long getDate() {
+        return date;
+    }
 
     /**
      * @return the shinkaislotitemno
@@ -98,6 +106,7 @@ public class MainServer {
     private static String Authorization_superuser = null;
     private static String Authorization_uploadstart2 = null;
     private static boolean DebugMode = false;
+    private static boolean EventMode = false;
     private static boolean stopScanner = false;
     private static boolean init = false;
     private static String webrootPath;
@@ -114,7 +123,8 @@ public class MainServer {
     private static Long zipFolder = null;
     private static Long initDate = null;
     private static HashMap<String,String> worldMap = new LinkedHashMap<>();
-    private static List<String> worldList = new ArrayList<>();
+    private static ArrayList<String> worldList = new ArrayList<>();
+    private static Long date = new Date().getTime();
     
     private static HashMap<String, String> FileList = new HashMap<>();  
     
@@ -181,6 +191,7 @@ public class MainServer {
             }
             
             MainServer.DebugMode = iniSection.getItem("debugMode").getValue().equals("1");
+            MainServer.EventMode = iniSection.getItem("eventMode").getValue().equals("1");
             MainServer.setLocaloldstart2(MainServer.dataFolder + File.separator + iniSection.getItem("localOldstart2").getValue());
             MainServer.kcwikiServerAddress = iniSection.getItem("kcwikiServerAddress").getValue(); 
             if(isDebugMode()){
@@ -298,7 +309,7 @@ public class MainServer {
         }
     }
     
-    private static boolean getWorldlist() {
+    public static boolean getWorldlist() {
         
         HttpURLConnection conn = null;
         try {  
@@ -378,6 +389,10 @@ public class MainServer {
             JSONArray worlds = JSON.parseArray(str);
             for(Object item:worlds) {
                 JSONObject world = (JSONObject) item;
+                /*if(!isApacheServer(world.getString("ip").trim())){
+                    getWorldMap().put(world.getString("id"), world.getString("ip"));
+                    getWorldList().add(world.getString("ip"));
+                }*/
                 getWorldMap().put(world.getString("id"), world.getString("ip"));
                 getWorldList().add(world.getString("ip"));
             }
@@ -393,6 +408,34 @@ public class MainServer {
         return true; 
     }
 
+    public static boolean isApacheServer(String ip) {
+        
+        try {
+            URL serverUrl = new URL("http://"+ip+"/kcs/");
+            msgPublish.msgPublisher(serverUrl.toString(),0,0);
+            HttpURLConnection urlcon = (HttpURLConnection) serverUrl.openConnection();;
+            System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
+            System.setProperty("sun.net.client.defaultReadTimeout", "15000");
+            
+            
+            urlcon.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");
+            urlcon.setRequestMethod("HEAD");
+            String ServerType = urlcon.getHeaderField("Server");
+            msgPublish.msgPublisher(ServerType,0,0);
+            if(ServerType.contains("nginx") || ServerType.contains("Nginx")){
+                return false;
+            }else{
+                return true;
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ProtocolException ex) {
+            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
+    }
 
     /**
      * @return the ffdecFolder
@@ -656,7 +699,7 @@ public class MainServer {
     /**
      * @return the worldList
      */
-    public static List<String> getWorldList() {
+    public static ArrayList<String> getWorldList() {
         return worldList;
     }
 
@@ -665,5 +708,12 @@ public class MainServer {
      */
     public static String getDutyno() {
         return dutyno;
+    }
+
+    /**
+     * @return the EventMode
+     */
+    public static boolean isEventMode() {
+        return EventMode;
     }
 }

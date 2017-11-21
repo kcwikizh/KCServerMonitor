@@ -63,31 +63,37 @@ public class CoreDecrypt {
             corePool.addTask(new Callable<Integer>() {
                 @Override
                 public Integer call() {
-                
+                String line;
                 try {
-                    Bfr = new BufferedReader(new InputStreamReader(new FileInputStream(map), Encoder.codeString(map)));
-                    String line;
-                    while ((line=Bfr.readLine())!=null) {
-                        if(line.contains("RND:Array")){
-                            int i=line.indexOf("RND:Array");   //取得子串的初始位置
-                            mapCode=line.substring(i+13,line.length()-2);
-                            break;
+                    if(!new File(map).exists()){
+                        msgPublish.msgPublisher("地图文件不存在。",0,-1);
+                    }else{
+                        Bfr = new BufferedReader(new InputStreamReader(new FileInputStream(map), Encoder.codeString(map)));
+                        while ((line=Bfr.readLine())!=null) {
+                            if(line.contains("RND:Array")){
+                                int i=line.indexOf("RND:Array");   //取得子串的初始位置
+                                mapCode=line.substring(i+13,line.length()-2);
+                                break;
+                            }
                         }
+                        Bfr.close();
+                        msgPublish.msgPublisher("地图加密数据读取成功",0,1);
                     }
-                    Bfr.close();
-                    msgPublish.msgPublisher("地图加密数据读取成功",0,1);
                     
-                    Bfr = new BufferedReader(new InputStreamReader(new FileInputStream(sound), Encoder.codeString(sound)));
-                    while ((line=Bfr.readLine())!=null) {
-                        if(line.contains("vcKey:Array")){
-                            int i=line.indexOf("vcKey:Array");   //取得子串的初始位置
-                            soundCode=line.substring(i+15,line.length()-2);
-                            break;
+                    if(!new File(map).exists()){
+                        msgPublish.msgPublisher("语音文件不存在。",0,-1);
+                    }else{
+                        Bfr = new BufferedReader(new InputStreamReader(new FileInputStream(sound), Encoder.codeString(sound)));
+                        while ((line=Bfr.readLine())!=null) {
+                            if(line.contains("vcKey:Array")){
+                                int i=line.indexOf("vcKey:Array");   //取得子串的初始位置
+                                soundCode=line.substring(i+15,line.length()-2);
+                                break;
+                            }
                         }
+                        Bfr.close();
+                        msgPublish.msgPublisher("语音加密数据读取成功",0,1);
                     }
-                    Bfr.close();
-                    msgPublish.msgPublisher("语音加密数据读取成功",0,1);
-                    
                     ecryptMap(mapCode,moe.kcwiki.initializer.MainServer.getMapid());
                     AnalyzeList.shipData();
                     new moe.kcwiki.downloader.DLThread().modifieddata(MainServer.getDownloadFolder()+File.separator+"Maps",ffpath, 1);
@@ -123,7 +129,7 @@ public class CoreDecrypt {
                     return taskID;
                 }   catch (Exception ex) {
                         Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                }
                 msgPublish.msgPublisher("decryptCore\t子线程运行完毕",0,0);
                 GetModifiedDataThread.finishJob();
                 return taskID;
@@ -211,6 +217,9 @@ public class CoreDecrypt {
             Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+        if(mapAddressList.isEmpty()){
+            getNormalMap(mapId);
+        }
         /*
         if(!mapAddressList.isEmpty()){
         runtime.exec("cmd.exe /c start \"\" \""+tppath+File.separator+"Core-Map.txt"+"\"");
@@ -218,6 +227,28 @@ public class CoreDecrypt {
         */
         return true;
     }
+    
+    public boolean getNormalMap(String mapId) {
+        try (FileWriter fout = new FileWriter(new File(tppath+File.separator+"Core-Map.txt"))) {
+            fout.write(new Date()+constant.LINESEPARATOR+constant.LINESEPARATOR+"新活动地图下载链接："+constant.LINESEPARATOR+constant.LINESEPARATOR);
+            String data;
+            for(int n=1; n<10; n++){
+                //http://ooi.moe/kcs/resources/swf/map/40_01.swf
+                data=kcwikiserver+"resources/swf/map/"+mapId+"_0"+n+".swf";
+                fout.write("第"+n+"张地图："+constant.LINESEPARATOR+data+constant.LINESEPARATOR);
+                //mapAddressList.put(data,s[0][1]+".swf");
+                mapAddressList.put(data,"第"+n+"张地图"+".swf");
+            }
+            fout.close();
+        } catch (IOException ex) {
+            msgPublish.msgPublisher("moe.kcwiki.decryptcore-CoreDecrypt-getNormalMap:IOException",0,-1);
+            Logger.getLogger(CoreDecrypt.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        
+        return true;
+    }
+    
     
     @SuppressWarnings("element-type-mismatch")
     public boolean ecryptSound(String str) {

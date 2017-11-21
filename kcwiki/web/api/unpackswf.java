@@ -19,11 +19,13 @@ import org.apache.commons.io.FileUtils;
  */
 public class unpackswf {
     private StringBuilder sb = null;
-    
     public String getData(String src,String dest) {
         sb = new StringBuilder();
-        new UnpackSwf().createDiffFile(dest,src);
-        this.addString("");
+        int count = new UnpackSwf().createDiffFile(dest,src);
+        this.addString("解压完成。");
+        this.addString("源文件夹：\t"+src);
+        this.addString("目标文件夹：\t"+dest);
+        this.addString("解压文件数量：\t"+count);
         
         return sb.toString();
     }

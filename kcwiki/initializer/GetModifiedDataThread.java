@@ -42,10 +42,7 @@ public class GetModifiedDataThread {
                     //new moe.kcwiki.getstart2data.Start2Analyzer().ReadNewFile(null);
                     timeStamp = String.valueOf(System.currentTimeMillis());
                     CoreDecrypt.setTimeStamp(timeStamp);
-                    GetUnkownShip unkownShip = new moe.kcwiki.monitor.file.GetUnkownShip();
-                    if(unkownShip.loadKnewFile()){
-                        unkownShip.getUnknowData();
-                    }
+                    new moe.kcwiki.monitor.file.GetUnkownShip().setterSplitter();
                     new moe.kcwiki.monitor.file.GetUnknowSlotitem().getUnknowData();
                     try {
                         new moe.kcwiki.monitor.file.GetLastModifiedData().doMonitor();

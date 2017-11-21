@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import moe.kcwiki.database.DBCenter;
 import moe.kcwiki.initializer.GetModifiedDataThread;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.tools.constant.constant;
@@ -82,7 +83,12 @@ public class Controller {
                                 }
                             }
                         }
-                        msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t img pHash互查对比完成，剩余文件："+new File(newFileFolder).listFiles().length,0,0);
+                        int lastest = new File(newFileFolder).listFiles().length;
+                        if(lastest != 0){
+                            //pHash互查对比完成
+                            msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t img 剩余文件："+lastest,0,0);
+                            DBCenter.imgdiff.add(newFileFolder);
+                        }
                         sleep(1*1000);
                     }
                     

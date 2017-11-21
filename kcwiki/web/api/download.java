@@ -19,20 +19,22 @@ public class download {
     
     public String getData() {
         sb = new StringBuilder();
-        Long date = MainServer.getZipFolder() ;
-        if(date == null ) {
+        Long date = MainServer.getDate();
+        File ZipFolder = new File(MainServer.getPublishFolder()+File.separator+date);
+        if(!ZipFolder.exists() || ZipFolder.list().length == 0) {
                 this.addString("<!DOCTYPE html><html><body>");
                 this.addString("文件队列仍未下载完毕，请等待后台下载进程执行。");
                 this.addString("</body></html>");
         }else{
-                File[] fl = new File(MainServer.getPublishFolder()+File.separator+MainServer.getZipFolder()).listFiles();
+            File[] fl = ZipFolder.listFiles();
                 //String Publishing = "/KcWikiOnline/custom/Publishing/"+ date +"/";
                 String Publishing = urlprefix + date +"/";
                 this.addString("<!DOCTYPE html><html><body>");
                 for(File zip:fl) {
                     String filename = zip.getName();
                     String url = null;
-                    
+                    if(filename.contains("gamefile"))
+                        url = "<a href=\""+Publishing+filename+"\" >" +"游戏核心差分文件" +"</a>";
                     if(filename.contains("sourcefile"))
                         url = "<a href=\""+Publishing+filename+"\" >" +"完整的拆包文件（包括差分音频），请配合kcre进行拆包工作。" +"</a>";
                     if(filename.contains("editorialfile"))

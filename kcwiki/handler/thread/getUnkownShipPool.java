@@ -86,7 +86,7 @@ public class getUnkownShipPool  {
     }
     
     public static boolean takeTask(){
-        final int taskID = corePool.getTaskNum();
+        final int taskID = modifieddataPool.getTaskNum();
         modifieddataPool.addTask(new Callable<Integer>() {
             @Override
             public Integer call() {

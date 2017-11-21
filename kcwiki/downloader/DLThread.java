@@ -45,7 +45,6 @@ public class DLThread {
     //Start2DataThread 核心下载线程
     public boolean start2() throws Exception{
         final String rootFolder=MainServer.getDownloadFolder();
-        Start2DataThread.addJob();
         
         final int taskID = start2dataPool.getTaskNum();
             start2dataPool.addTask(new Callable<Integer>() {
@@ -268,7 +267,7 @@ public class DLThread {
                                 break;
                             }
                             if(reCode==2){ 
-                                value++;  
+                                //value++;  
                                 //moe.kcwiki.massagehandler.MainGui.jProgressBar1.setValue(value);
                             } 
                         }catch (Exception e) {
@@ -277,7 +276,7 @@ public class DLThread {
                         }
                     }
                     String decompressionFolder = MainServer.getWorksFolder()+File.separator+"maps";
-                    if(CoreDecrypt.mapAddressList.isEmpty()){
+                    if(value == 0){
                         msgPublish.msgPublisher("数据库中没有新地图信息。",0,0);
                     }else{
                         msgPublish.msgPublisher("地图数据下载完成",0,1);

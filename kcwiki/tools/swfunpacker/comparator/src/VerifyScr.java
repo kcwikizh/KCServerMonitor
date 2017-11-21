@@ -49,8 +49,11 @@ public class VerifyScr {
                     
                     swfSrcPatch.put(newFileFolder.substring(rootFolder.length()+1, newFileFolder.length()), fileData.clone());
                     fileData.clear();
-                    
-                    msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr MD5互查对比完成，剩余文件："+(oldScr-newScr),0,0);
+                    int lastest = oldScr-newScr;
+                    if(lastest != 0){
+                        //MD5互查对比完成
+                        msgPublish.msgPublisher(filename.substring(filename.lastIndexOf(File.separator)+1, filename.length())+"\t scr 剩余文件："+lastest,0,0);
+                    }
                     scrDelList.clear();
                     //String data = JSON.toJSONString(swfSrcPatch,SerializerFeature.BrowserCompatible);
                 }

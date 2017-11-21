@@ -48,80 +48,96 @@ public class srcdiff {
             String regEx="[^0-9]";   
             Pattern p = Pattern.compile(regEx);   
             Matcher m;   
-            for(String key:dutyList.keySet()){
-                JSONObject duty = (JSONObject) dutyList.get(key);
-                this.addString("任务id：\t"+key);
-                this.addString("任务完成消息：\t"+duty.getString("message1"));
-                
-                List<String> update = duty.getObject("update",List.class);
-                if(update != null) {
-                    if(update.size() > 1){
-                        this.addString("以下装备or道具可能只能获得其中一个，请以游戏为准。");
-                    }
-                    for(String updatekey:update) {
-                        updateList.add(updatekey);
-                        switch(updatekey){
-                            case "slotitem":
-                                String from = duty.getString("item_from");
-                                if(from == null) continue;
-                                if(!from.equals("-1")) {
-                                    m = p.matcher(from);
-                                    this.addString("消耗装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                String to = duty.getString("item_to");
-                                if(to == null) continue;
-                                if(!to.equals("-1")) {
-                                    m = p.matcher(to);
-                                    this.addString("获得装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                break;
-                            case "useitem":
-                                from = duty.getString("item_from");
-                                if(from == null) continue;
-                                if(!from.equals("-1")) {
-                                    m = p.matcher(from);
-                                    this.addString("消耗道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                to = duty.getString("item_to");
-                                if(to == null) continue;
-                                if(!to.equals("-1")) {
-                                    m = p.matcher(to);
-                                    this.addString("获得道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                break;
+            if(dutyList != null && !dutyList.isEmpty()){
+                for(String key:dutyList.keySet()){
+                    JSONObject duty = (JSONObject) dutyList.get(key);
+                    this.addString("任务id：\t"+key);
+                    this.addString("任务完成消息：\t"+duty.getString("message1"));
+
+                    List<String> update = duty.getObject("update",List.class);
+                    if(update != null) {
+                        if(update.size() > 1){
+                            this.addString("以下装备or道具可能只能获得其中一个，请以游戏为准。");
+                        }
+                        for(String updatekey:update) {
+                            updateList.add(updatekey);
+                            switch(updatekey){
+                                case "slotitem":
+                                    String from = duty.getString("item_from");
+                                    if(from == null) continue;
+                                    if(!from.equals("-1")) {
+                                        m = p.matcher(from);
+                                        this.addString("消耗装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    String to = duty.getString("item_to");
+                                    if(to == null) continue;
+                                    if(!to.equals("-1")) {
+                                        m = p.matcher(to);
+                                        this.addString("获得装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    break;
+                                case "useitem":
+                                    from = duty.getString("item_from");
+                                    if(from == null) continue;
+                                    if(!from.equals("-1")) {
+                                        m = p.matcher(from);
+                                        this.addString("消耗道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    to = duty.getString("item_to");
+                                    if(to == null) continue;
+                                    if(!to.equals("-1")) {
+                                        m = p.matcher(to);
+                                        this.addString("获得道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    break;
+                            }
                         }
                     }
-                }
-                
-                JSONObject lost = (JSONObject) duty.get("lost");
-                if(lost != null) {
-                    for(String lostkey:lost.keySet()) {
-                        lostList.add(lostkey);
-                        switch(lostkey){
-                            case "slotitem":
-                                JSONArray lostslotitem = lost.getJSONArray(lostkey);
-                                for(Object slotitemkey:lostslotitem) {
-                                    JSONObject lostobject = (JSONObject) slotitemkey;
-                                    String id = lostobject.getString("id").trim();
-                                    this.addString("消耗装备：\t"+slotitemMap.get(id).getString("api_name"));
-                                    this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
-                                }
-                                break;
-                            case "useitem":
-                                lostslotitem = lost.getJSONArray(lostkey);
-                                for(Object slotitemkey:lostslotitem) {
-                                    JSONObject lostobject = (JSONObject) slotitemkey;
-                                    String id = lostobject.getString("id").trim();
-                                    this.addString("消耗道具：\t"+useitemmMap.get(id).getString("api_name"));
-                                    this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
-                                }
-                                break;
+
+                    JSONObject lost = (JSONObject) duty.get("lost");
+                    if(lost != null) {
+                        for(String lostkey:lost.keySet()) {
+                            lostList.add(lostkey);
+                            switch(lostkey){
+                                case "slotitem":
+                                    JSONArray lostslotitem = lost.getJSONArray(lostkey);
+                                    for(Object slotitemkey:lostslotitem) {
+                                        JSONObject lostobject = (JSONObject) slotitemkey;
+                                        String id = lostobject.getString("id").trim();
+                                        this.addString("消耗装备：\t"+slotitemMap.get(id).getString("api_name"));
+                                        this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
+                                    }
+                                    break;
+                                case "useitem":
+                                    lostslotitem = lost.getJSONArray(lostkey);
+                                    for(Object slotitemkey:lostslotitem) {
+                                        JSONObject lostobject = (JSONObject) slotitemkey;
+                                        String id = lostobject.getString("id").trim();
+                                        this.addString("消耗道具：\t"+useitemmMap.get(id).getString("api_name"));
+                                        this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
+                                    }
+                                    break;
+                            }
                         }
                     }
+                    this.addString(LINESEPARATOR);
+                    this.addString("-------------------------------------");
+                    this.addString(LINESEPARATOR);
                 }
-                this.addString(LINESEPARATOR);
-                this.addString("-------------------------------------");
-                this.addString(LINESEPARATOR);
+            }
+            if(!DBCenter.battleData.isEmpty()) {
+                    this.addString("<h1>削甲情报：</h1> （请以实际游戏体验为准）"+LINESEPARATOR);
+                    this.addString(JSON.toJSONString(DBCenter.battleData));
+                    this.addString(LINESEPARATOR);
+                    this.addString("-------------------------------------");
+                    this.addString(LINESEPARATOR);
+            }
+            if(!DBCenter.lastgaugeData.isEmpty()) {
+                    this.addString("<h1>海域斩杀血量情报：</h1> （请以实际游戏体验为准）"+LINESEPARATOR);
+                    this.addString(JSON.toJSONString(DBCenter.lastgaugeData));
+                    this.addString(LINESEPARATOR);
+                    this.addString("-------------------------------------");
+                    this.addString(LINESEPARATOR);
             }
             this.addString(LINESEPARATOR);
             this.addString(LINESEPARATOR);

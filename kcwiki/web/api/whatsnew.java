@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -36,103 +37,173 @@ public class whatsnew {
     private HashMap<String,JSONObject> useitemmMap = new HashMap<>();
     private JSONObject start2 = JSON.parseObject(new Start2Api().GetStart2Api(MainServer.getNewstart2()));
     private static final String file = MainServer.getWorksFolder()+File.separator+"Start2_Export.txt";
+    private boolean debug = false;
+    private String mapID = MainServer.getMapid();
     
     public String getData() {
         sb = new StringBuilder();
-        if(!new File(file).exists() && DBCenter.dutyData == null){
+        if(!new File(file).exists() && DBCenter.dutyData == null && 
+                DBCenter.battleData.isEmpty() && DBCenter.lastgaugeData.isEmpty() 
+                && !debug){
             this.addString("<!DOCTYPE html><html><body>");
             this.addString("没有发现新文件或者抓包程序未运行，请等待后台抓包进程执行。");
             this.addString("</body></html>");
         } else {
-            readJSON();
+            if(!readJSON()){
+                this.addString("Start2获取失败");
+                return sb.toString();
+            }
             this.addString(LINESEPARATOR);
-            this.addString("<h1>新任务情报：</h1> "+LINESEPARATOR);
-            JSONObject dutyList = DBCenter.dutyData;
-            List<String> updateList = new ArrayList<>();
-            List<String> lostList = new ArrayList<>();
-            String regEx="[^0-9]";   
-            Pattern p = Pattern.compile(regEx);   
-            Matcher m;   
-            int dutyNO = Integer.valueOf(MainServer.getDutyno());
-            for(String key:dutyList.keySet()){
-                if(Integer.valueOf(key) < dutyNO)
-                    continue;
-                JSONObject duty = (JSONObject) dutyList.get(key);
-                this.addString("任务id：\t"+key);
-                this.addString("任务完成消息：\t"+duty.getString("message1"));
-                
-                List<String> update = duty.getObject("update",List.class);
-                if(update != null) {
-                    if(update.size() > 1){
-                        this.addString("以下装备or道具可能只能获得其中一个，请以游戏为准。");
-                    }
-                    for(String updatekey:update) {
-                        updateList.add(updatekey);
-                        switch(updatekey){
-                            case "slotitem":
-                                String from = duty.getString("item_from");
-                                if(from == null) continue;
-                                if(!from.equals("-1")) {
-                                    m = p.matcher(from);
-                                    this.addString("消耗装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                String to = duty.getString("item_to");
-                                if(to == null) continue;
-                                if(!to.equals("-1")) {
-                                    m = p.matcher(to);
-                                    this.addString("获得装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                break;
-                            case "useitem":
-                                from = duty.getString("item_from");
-                                if(from == null) continue;
-                                if(!from.equals("-1")) {
-                                    m = p.matcher(from);
-                                    this.addString("消耗道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                to = duty.getString("item_to");
-                                if(to == null) continue;
-                                if(!to.equals("-1")) {
-                                    m = p.matcher(to);
-                                    this.addString("获得道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
-                                }
-                                break;
+            if(DBCenter.dutyData != null && !DBCenter.dutyData.isEmpty()){
+                this.addString("<h1>新任务情报：</h1> "+LINESEPARATOR);
+                JSONObject dutyList = DBCenter.dutyData;
+                List<String> updateList = new ArrayList<>();
+                List<String> lostList = new ArrayList<>();
+                String regEx="[^0-9]";   
+                Pattern p = Pattern.compile(regEx);   
+                Matcher m;   
+                int dutyNO = Integer.valueOf(MainServer.getDutyno());
+                for(String key:dutyList.keySet()){
+                    if(Integer.valueOf(key) < dutyNO)
+                        continue;
+                    JSONObject duty = (JSONObject) dutyList.get(key);
+                    this.addString("任务id：\t"+key);
+                    this.addString("任务完成消息：\t"+duty.getString("message1"));
+
+                    List<String> update = duty.getObject("update",List.class);
+                    if(update != null) {
+                        if(update.size() > 1){
+                            this.addString("以下装备or道具可能只能获得其中一个，请以游戏为准。");
+                        }
+                        for(String updatekey:update) {
+                            updateList.add(updatekey);
+                            switch(updatekey){
+                                case "slotitem":
+                                    String from = duty.getString("item_from");
+                                    if(from == null) continue;
+                                    if(!from.equals("-1")) {
+                                        m = p.matcher(from);
+                                        this.addString("消耗装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    String to = duty.getString("item_to");
+                                    if(to == null) continue;
+                                    if(!to.equals("-1")) {
+                                        m = p.matcher(to);
+                                        this.addString("获得装备：\t"+slotitemMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    break;
+                                case "useitem":
+                                    from = duty.getString("item_from");
+                                    if(from == null) continue;
+                                    if(!from.equals("-1")) {
+                                        m = p.matcher(from);
+                                        this.addString("消耗道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    to = duty.getString("item_to");
+                                    if(to == null) continue;
+                                    if(!to.equals("-1")) {
+                                        m = p.matcher(to);
+                                        this.addString("获得道具：\t"+useitemmMap.get(m.replaceAll("").trim()).getString("api_name"));
+                                    }
+                                    break;
+                            }
                         }
                     }
-                }
-                
-                JSONObject lost = (JSONObject) duty.get("lost");
-                if(lost != null) {
-                    for(String lostkey:lost.keySet()) {
-                        lostList.add(lostkey);
-                        switch(lostkey){
-                            case "slotitem":
-                                JSONArray lostslotitem = lost.getJSONArray(lostkey);
-                                for(Object slotitemkey:lostslotitem) {
-                                    JSONObject lostobject = (JSONObject) slotitemkey;
-                                    String id = lostobject.getString("id").trim();
-                                    this.addString("消耗装备：\t"+slotitemMap.get(id).getString("api_name"));
-                                    this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
-                                }
-                                break;
-                            case "useitem":
-                                lostslotitem = lost.getJSONArray(lostkey);
-                                for(Object slotitemkey:lostslotitem) {
-                                    JSONObject lostobject = (JSONObject) slotitemkey;
-                                    String id = lostobject.getString("id").trim();
-                                    this.addString("消耗道具：\t"+useitemmMap.get(id).getString("api_name"));
-                                    this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
-                                }
-                                break;
+
+                    JSONObject lost = (JSONObject) duty.get("lost");
+                    if(lost != null) {
+                        for(String lostkey:lost.keySet()) {
+                            lostList.add(lostkey);
+                            switch(lostkey){
+                                case "slotitem":
+                                    JSONArray lostslotitem = lost.getJSONArray(lostkey);
+                                    for(Object slotitemkey:lostslotitem) {
+                                        JSONObject lostobject = (JSONObject) slotitemkey;
+                                        String id = lostobject.getString("id").trim();
+                                        this.addString("消耗装备：\t"+slotitemMap.get(id).getString("api_name"));
+                                        this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
+                                    }
+                                    break;
+                                case "useitem":
+                                    lostslotitem = lost.getJSONArray(lostkey);
+                                    for(Object slotitemkey:lostslotitem) {
+                                        JSONObject lostobject = (JSONObject) slotitemkey;
+                                        String id = lostobject.getString("id").trim();
+                                        this.addString("消耗道具：\t"+useitemmMap.get(id).getString("api_name"));
+                                        this.addString("消耗数量：\t"+lostobject.getString("count").trim());   
+                                    }
+                                    break;
+                            }
                         }
                     }
+                    this.addString(LINESEPARATOR);
+                    this.addString("-------------------------------------");
                 }
-                this.addString(LINESEPARATOR);
-                this.addString("-------------------------------------");
-                this.addString(LINESEPARATOR);
+            }else{
+                this.addString("无新任务。");
             }
             this.addString(LINESEPARATOR);
             
+            if(!DBCenter.battleData.isEmpty()) {
+                this.addString(LINESEPARATOR);
+                this.addString("<h1>削甲情报：</h1> （请以实际游戏体验为准）"+LINESEPARATOR);
+                for(JSONObject item:DBCenter.battleData) {
+                    for(String key:item.keySet()){
+                        switch(key){
+                            default:
+                                this.addString(key+":\t"+item.getString(key));
+                                break;
+                            case "id":
+                                this.addString("深海编号:\t"+item.getString(key));
+                                break;
+                            case "message":
+                                this.addString("信息:\t"+item.getString(key));
+                                break;
+                            case "voice":
+                                this.addString("语音编号:\t"+item.getString(key));
+                                break;
+                            case "stype":
+                                this.addString("类型:\t"+item.getString(key));
+                                break;
+                        }  
+                    }
+                    this.addString("-------------------------------------");
+                }
+                this.addString(LINESEPARATOR);
+            }
+            
+            if(!DBCenter.lastgaugeData.isEmpty()) {
+                this.addString(LINESEPARATOR);
+                this.addString("<h1>海域斩杀血量情报：</h1> （请以实际游戏体验为准）"+LINESEPARATOR);
+                String[] difficulty = {"丙","乙","甲"};
+                Set<String> mapIDs = DBCenter.lastgaugeData.keySet();
+                for(String id:mapIDs) {
+                    if(!id.contains(mapID)){
+                        continue;
+                    }
+                    ArrayList<HashMap<String,String>> mapData = DBCenter.lastgaugeData.get(id);
+                    this.addString("<h3>"+"编号为：  "+id+"  的海域存在统一斩杀血量"+"</h3>");
+                    for(HashMap<String,String> map:mapData){
+                        for(String key:map.keySet()){
+                        switch(key){
+                            default:
+                                this.addString(key+":\t"+map.get(key));
+                                break;
+                            case "difficulty":
+                                this.addString("难度:\t"+difficulty[Integer.valueOf(map.get(key))-1]);
+                                break;
+                            case "mapHP":
+                                this.addString("卡斩海域血量:\t"+map.get(key));
+                                break;
+                        }
+                        }  
+                    }
+                    this.addString("-------------------------------------");
+                }
+                this.addString(LINESEPARATOR);
+            }
+            
+        if(new File(file).exists()){
             try {
                 BufferedReader br=new BufferedReader( new InputStreamReader(new FileInputStream(file), "UTF-8"));
                 String line="";
@@ -147,11 +218,14 @@ public class whatsnew {
                 Logger.getLogger(whatsnew.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+        }
         return sb.toString();
     }
     
-    public void readJSON(){
+    public boolean readJSON(){
+        if(start2 == null || start2.isEmpty()){
+            return false;
+        }
         JSONArray List = start2.getJSONArray("api_mst_slotitem");
         for(int i = 0; i < List.size(); i++) {
             JSONObject tmp = List.getJSONObject(i);
@@ -162,6 +236,7 @@ public class whatsnew {
             JSONObject tmp = List.getJSONObject(i);
             useitemmMap.put(tmp.getString("api_id"), tmp);
         }
+        return true;
     }
     
     public void addData(String str) {

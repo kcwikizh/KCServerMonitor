@@ -1027,7 +1027,7 @@ public class Start2Analyzer {
             eBfw.write(constant.LINESEPARATOR);
             eBfw.write("目前统计如下："+constant.LINESEPARATOR);
             
-            if (!DBCenter.SuspectShipData.isEmpty()){   //suspectData
+            if (!DBCenter.SuspectShipData.isEmpty() && !MainServer.isEventMode()){   //suspectData
                 eBfw.write(constant.LINESEPARATOR+constant.LINESEPARATOR+"发现新立绘："+constant.LINESEPARATOR+constant.LINESEPARATOR);
                 wfFlag=true;
                 eBfw.write("种类：\t\t\t 文件名："+constant.LINESEPARATOR+constant.LINESEPARATOR);

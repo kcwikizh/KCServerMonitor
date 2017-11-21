@@ -24,16 +24,23 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static moe.kcwiki.initializer.MainServer.isStopScanner;
 import moe.kcwiki.handler.massage.msgPublish;
 import moe.kcwiki.handler.thread.modifieddataPool;
+import moe.kcwiki.tools.compressor.ZipCompressor;
 import moe.kcwiki.tools.constant.constant;
 import static moe.kcwiki.tools.constant.constant.FILESEPARATOR;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -47,11 +54,12 @@ public class GetLastModifiedData {
     private static JSONArray modifidedData;
     private final String rootFolder = MainServer.getTempFolder() + File.separator+"newSlotItem";
     //String[] serverlistaddress= new String[]{"203.104.209.71", "203.104.209.87", "125.6.184.16", "125.6.187.205", "125.6.187.229","125.6.187.253", "125.6.188.25", "203.104.248.135", "125.6.189.7", "125.6.189.39","125.6.189.71", "125.6.189.103", "125.6.189.135", "125.6.189.167", "125.6.189.215","125.6.189.247", "203.104.209.23", "203.104.209.39", "203.104.209.55", "203.104.209.102"};
-    private static List<String> serverlistaddress = MainServer.getWorldList();
+    private static ArrayList<String> serverlistaddress = (ArrayList<String>) MainServer.getWorldList().clone();
     private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
-    private static String serveraddress;
+    private static String serveraddress  = "203.104.209.102";
     private static String servername = "203.104.209.102";
     private static int servernum=0;
+    private static boolean isEvent = MainServer.isEventMode();
     
 
     public GetLastModifiedData() throws UnsupportedEncodingException, IOException {
@@ -86,29 +94,45 @@ public class GetLastModifiedData {
         modifidedData=JSON.parseArray(str);
         
         final int taskID = modifieddataPool.getTaskNum();
-            modifieddataPool.addTask(() -> {
-            int countno=1;
-            while(!isStopScanner()){
-                msgPublish.msgPublisher("开始第"+countno+"轮文件扫描。",0,0);
-                if(getNewData(modifidedData)) {
-                    break;
-                }
-                countno++;
-                try {
-                    if(isStopScanner()){
+            modifieddataPool.addTask(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                int countno=1;
+                while(!isStopScanner()){
+                    msgPublish.msgPublisher("开始第"+countno+"轮文件扫描。",0,0);
+                    if(getNewData(modifidedData)) {
                         break;
                     }
-                    msgPublish.msgPublisher("文件扫描线程进入等待阶段",0,0);
-                    sleep(3*60*1000);
-                } catch (InterruptedException ex) {
-                    //msgPublish.msgPublisher("moe.kcwiki.getmodifieddata.GetLastModifiedData-doMonitor-InterruptedException",0,0);
-                    Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
-                    msgPublish.msgPublisher("文件扫描线程已强制退出。",0,0);
-                    return taskID;
+                    countno++;
+                    try {
+                        if(isStopScanner()){
+                            break;
+                        }
+                        msgPublish.msgPublisher("文件扫描线程进入等待阶段",0,0);
+                        sleep(90*1000);
+                    } catch (InterruptedException ex) {
+                        //msgPublish.msgPublisher("moe.kcwiki.getmodifieddata.GetLastModifiedData-doMonitor-InterruptedException",0,0);
+                        Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
+                        msgPublish.msgPublisher("文件扫描线程已强制退出。",0,0);
+                        return taskID;
+                    }
                 }
+                msgPublish.msgPublisher("文件扫描线程已停止。",0,0);
+                long date = MainServer.getDate();
+                String tempZipFolder = MainServer.getPublishFolder()+FILESEPARATOR+date;
+                ZipCompressor.createZip(MainServer.getDownloadFolder()+FILESEPARATOR+"kcs", tempZipFolder, date+"-gamefiles.zip");
+                if(!MainServer.isDebugMode() && !isStopScanner()){
+                    File Persistence = new File(MainServer.getMuseumFolder()+FILESEPARATOR+"GameCore");
+                    File tmp = new File(tempZipFolder+FILESEPARATOR+date+"-gamefiles.zip");
+                    if(!Persistence.exists())
+                        Persistence.mkdirs();
+                    if(tmp.exists()){
+                        msgPublish.msgPublisher("准备拷贝文件："+tmp.getAbsolutePath()+"\t"+Persistence,0,0);
+                        FileUtils.copyFileToDirectory(tmp, Persistence);
+                    }
+                }
+                return taskID;
             }
-            msgPublish.msgPublisher("文件扫描线程已停止。",0,0);
-            return taskID;
         },taskID,"moe.kcwiki.getmodifieddata-GetLastModifiedData-doMonitor");
         return true;
     }
@@ -156,21 +180,23 @@ public class GetLastModifiedData {
                     }
                     JSONObject object=(JSONObject)iterator.next();
                         int count=0;
-                        while(count<3){
+                        while(count<2){
                             String url;
-                            /*if(!MainServer.isDebugMode()){
+                            if(!MainServer.isDebugMode() && isEvent){
                                 url="http://"+serveraddress+"/kcs/";
                             }else{
                                 url=MainServer.getKcwikiServerAddress();
-                            }*/
-                            url=MainServer.getKcwikiServerAddress();
+                            }
+                            //url=MainServer.getKcwikiServerAddress();
                             //url=MainServer.getKcwikiServerAddress();
                             String path = object.getString("path");
-                            if (getMDD(url+path,Long.parseLong(object.getString("timestamp")),-1,serveraddress)) {
+                            if (getMDD(url+path,Long.parseLong(object.getString("timestamp")),-1,serveraddress,object.getString("hash"))) {
                                 if(path.toLowerCase().contains("core")){
                                    isFinish = true; 
                                 }
                                 break;
+                            }else{
+                                serverAddress();
                             }
                             count++;
                         }
@@ -181,7 +207,7 @@ public class GetLastModifiedData {
         return isFinish;
     }
 
-    public boolean getMDD(String URL,Long flie,int nameNo,String serveraddress){
+    public boolean getMDD(String URL,Long flie,int nameNo,String serveraddress,String HashHex){
         int i=URL.lastIndexOf("/"); //取得子串的初始位置
         String filename;
         if(nameNo==-1){
@@ -196,12 +222,11 @@ public class GetLastModifiedData {
         }
         String filepath=MainServer.getDownloadFolder()+File.separator+sourcepath;
         
-        Long one=flie;
         URL serverUrl;
         HttpURLConnection urlcon ;
         
         try {
-            serverUrl = new URL(URL);
+            serverUrl = new URL(URL+ "?_=" + System.currentTimeMillis());
             /*if(!MainServer.isDebugMode()){
                 Proxy httpproxy = MainServer.getHttpproxy();
                 urlcon = (HttpURLConnection) serverUrl.openConnection(httpproxy);
@@ -216,8 +241,15 @@ public class GetLastModifiedData {
         }
         System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
         System.setProperty("sun.net.client.defaultReadTimeout", "15000");
-               
+        
+        urlcon.setIfModifiedSince(flie);
+        urlcon.setUseCaches(false);
+        urlcon.setConnectTimeout(500);
+        urlcon.setReadTimeout(5000);
         urlcon.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
+        /*urlcon.setRequestProperty( "Cache-Control",  "no-cache" );
+        urlcon.setRequestProperty( "Expires",  "0" );
+        urlcon.setRequestProperty( "Pragma",  "no-cache" );*/
         try {
             urlcon.setRequestMethod("HEAD");
         } catch (ProtocolException ex) {
@@ -225,7 +257,7 @@ public class GetLastModifiedData {
             Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        urlcon.setIfModifiedSince(one);
+        
         try{
             String message = urlcon.getHeaderField(0);
             if(message==null){
@@ -261,11 +293,26 @@ public class GetLastModifiedData {
                 urlcon.disconnect();
             }
             if(message.contains("HTTP/1.1 200 OK")){
+                if(flie >= urlcon.getLastModified()){
+                    urlcon.disconnect();
+                    //msgPublish.msgPublisher("移除无法识别If-Modified-Since的服务器：\t"+serveraddress,0,0); 
+                    //msgPublish.msgPublisher("服务器：\t"+serveraddress+"\t文件时差：\t"+(urlcon.getLastModified()-flie),0,0); 
+                    serverlistaddress.remove(serveraddress);
+                    //serverlistaddress = MainServer.getWorldList();
+                    return false;
+                }
                 urlcon.disconnect();
                 if  (!(new File(filepath).exists())||!(new File(filepath).isDirectory())) {
                     new File(filepath) .mkdirs();  
                 }
                 if(new DlCore().download(URL, filepath+FILESEPARATOR+filename,proxyhost,proxyport)){
+                    String hashhex = getMD5Checksum(filepath+FILESEPARATOR+filename);
+                    //msgPublish.msgPublisher(filename+"\t"+urlcon.getLastModified(),0,0);
+                    //msgPublish.msgPublisher(filename+"\t"+flie,0,0);
+                    //msgPublish.msgPublisher(filename+"\t"+hashhex,0,0);
+                    if(hashhex.equals(HashHex)){
+                        return false;
+                    }
                     msgPublish.msgPublisher(filename+"\t下载完成",0,0);
                     if(URL.contains(".swf")){
                         new moe.kcwiki.tools.swfunpacker.Controller().Analysis(filename,filepath,sourcepath);   
@@ -300,13 +347,33 @@ public class GetLastModifiedData {
         }
     }
     
-    
+    public static String getMD5Checksum(String filename) {
+        String md5 = "";
+        try (FileInputStream fis = new FileInputStream(filename)) {
+            md5 = DigestUtils.md5Hex(IOUtils.toByteArray(fis));
+            IOUtils.closeQuietly(fis);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
+            msgPublish.msgPublisher("modifiedCheck-getMD5Checksum模块读写时发生FileNotFoundException错误。",0,-1); 
+        } catch (IOException ex) {
+            Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
+            msgPublish.msgPublisher("modifiedCheck-getMD5Checksum模块读写时发生IOException错误。",0,-1); 
+        }
+        return md5;
+    }
     
     private void serverAddress(){
-        serveraddress=serverlistaddress.get(servernum);
-        servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
-        servernum++;
-        if(servernum==serverlistaddress.size()){
+        if(servernum >= serverlistaddress.size()-1){
+            servernum=0;
+        }
+        if(serverlistaddress.isEmpty()){
+            serveraddress = "203.104.209.102";
+        }else{
+            serveraddress=serverlistaddress.get(servernum);
+            servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
+            servernum++;
+        }
+        if(servernum >= serverlistaddress.size()){
             servernum=0;
         }
     }

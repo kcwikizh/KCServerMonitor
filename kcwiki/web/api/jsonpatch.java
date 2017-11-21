@@ -24,9 +24,10 @@ public class jsonpatch {
             this.addString("</body></html>");
         } else {
             this.addString(LINESEPARATOR);
-            for (String key:DBCenter.JsonPatch.keySet()) {
+            /*for (String key:DBCenter.JsonPatch.keySet()) {
                 this.addString(JSON.toJSONString(DBCenter.JsonPatch.get(key)));
-            }
+            }*/
+            this.addString(JSON.toJSONString(DBCenter.JsonPatch));
         }
         
         return sb.toString();

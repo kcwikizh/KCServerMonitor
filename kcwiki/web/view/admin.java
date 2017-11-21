@@ -99,7 +99,7 @@ public class admin extends HttpServlet{
                     }
                     break;
                 case "ininPool":
-                    
+                    start2dataPool.setIsOnline(false);
                     if(Controller.isIsPoolInit()){
                         data.put("info", "进程池已初始化成功，无需再次初始化。");
                     }else{

@@ -25,6 +25,10 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,6 +46,8 @@ import static moe.kcwiki.handler.thread.getUnkownShipPool.*;
 import moe.kcwiki.tools.GetHash;
 import moe.kcwiki.tools.constant.constant;
 import moe.kcwiki.tools.Encoder;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -53,14 +59,15 @@ public class GetUnkownShip {
     private final String localoldstart2;
     private final String proxyhost;
     private final int proxyport;
-    private static String serveraddress;
+    private static String serveraddress = "203.104.209.102";
     private static String servername;
     private static int servernum=0;
     public static LinkedHashMap<String, String> unknowShipList = new LinkedHashMap<>(); 
     private final static Set<String> md5DataSet = new HashSet<>();
     private final static List<JSONObject> md5DataList = new ArrayList<>();
+    private static int blockCount = 30;
     //private final static LinkedHashMap<String,JSONObject> md5DataMap = new LinkedHashMap<>();
-    private static List<String> serverlistaddress = MainServer.getWorldList();
+    private static ArrayList<String> serverlistaddress = MainServer.getWorldList();
     private static String[] serverlistname = new String[]{"横须贺镇守府","呉镇守府","佐世保镇守府","舞鹤镇守府","大凑警备府","トラック泊地","リンガ泊地","ラバウル基地","ショートランド泊地","ブイン基地","タウイタウイ泊地","パラオ泊地","ブルネイ泊地","単冠湾泊地","幌筵泊地","宿毛湾泊地","鹿屋基地","岩川基地","佐伯湾泊地","柱岛泊地"};
     private GetHash Hash = new GetHash();
     private final String rootFolder = MainServer.getTempFolder()+File.separator+"newShip";
@@ -75,7 +82,7 @@ public class GetUnkownShip {
         this.proxyport = moe.kcwiki.initializer.MainServer.getProxyport();
         unknowShipFile = MainServer.getDataFolder()+File.separator+"unknowShip";
         //dataList = new  java.util.ArrayList<>();
-        serverAddress();
+        //serverAddress();
     }
         
     public boolean loadKnewFile(){
@@ -230,79 +237,10 @@ public class GetUnkownShip {
         return true;
     }
 
-    public void getUnknowData(){
-        
-        unknowShipList.clear();
-        LinkedHashMap<String, String> alldataList = new LinkedHashMap<>(); 
-        LinkedHashMap<String, String> olddataFileList = new LinkedHashMap<>();
-        LinkedHashMap<String, String> olddataIdList = new LinkedHashMap<>();
-        StringBuilder buffer;
-        String line;
-        /*
-        try (BufferedReader nBfr = new BufferedReader(new InputStreamReader(new FileInputStream(unknowShipFile+".txt"), Encoder.codeString(unknowShipFile+".txt")))) {
-            while ((line=nBfr.readLine())!=null) {
-                if(line.contains("\t")){
-                    String[] data=line.split("\t");
-                    alldataList.put(data[0], data[1]);
-                }
-            }
-            
-            try (BufferedReader Bfr = new BufferedReader(new InputStreamReader(new FileInputStream(localoldstart2), Encoder.codeString(localoldstart2)))) {
-                buffer = new StringBuilder();
-                while ((line=Bfr.readLine())!=null) {
-                    buffer.append(line);
-                }
-            }
-            JSONObject Data=JSON.parseObject(buffer.toString());
-            JSONArray newData=Data.getJSONArray("api_mst_shipgraph");
-            Iterator iterator=newData.iterator();
-            while(iterator.hasNext()){
-                JSONObject newObject=(JSONObject)iterator.next();
-                olddataFileList.put(newObject.getString("api_id"), newObject.getString("api_filename"));
-            }
-            
-            newData=Data.getJSONArray("api_mst_ship");
-            iterator=newData.iterator();
-            while(iterator.hasNext()){
-                JSONObject newObject=(JSONObject)iterator.next();
-                olddataIdList.put(newObject.getString("api_id"), newObject.getString("api_name"));
-            }
-            
-            alldataList.entrySet().stream().filter((ship) -> (!olddataFileList.containsValue(ship.getValue()))).forEachOrdered((ship) -> {
-                if(ship.getKey().contains("-")){
-                    if(!dataList.contains(ship.getValue())){
-                        dataList.add(ship.getValue());
-                    }
-                }else if(Integer.parseInt(ship.getKey()) <= 2000){
-                    if(!dataList.contains(ship.getValue())){
-                        dataList.add(ship.getValue());
-                    }
-                }
-            });
-
-            olddataFileList.entrySet().stream().filter((ship) -> (!olddataIdList.containsKey(ship.getKey()))).forEachOrdered((ship) -> {
-                if(ship.getKey().contains("-")){
-                    if(!dataList.contains(ship.getValue())){
-                        dataList.add(ship.getValue());
-                    }
-                }else if(Integer.parseInt(ship.getKey())<=2000){
-                    if(!dataList.contains(ship.getValue())){
-                        dataList.add(ship.getValue());
-                    }
-                }
-            });
-            
-        } catch (FileNotFoundException ex) {
-                msgPublish.msgPublisher("moe.kcwiki.getmodifieddata-GetUnkownShip-getAllData:FileNotFoundException",0,-1);
-                Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                msgPublish.msgPublisher("moe.kcwiki.getmodifieddata-GetUnkownShip-getAllData:IOException",0,-1);
-                Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                msgPublish.msgPublisher("moe.kcwiki.getmodifieddata-GetUnkownShip-getAllData:Exception",0,-1);
-                Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        */
+    public void getUnknowData(List<JSONObject> md5DataList,int blockno){
+        /*if(MainServer.isDebugMode()){
+            return;
+        }*/
         
         final int taskID = getUnkownShipPool.getTaskNum();
         getUnkownShipPool.addTask(new Callable<Integer>() {
@@ -312,150 +250,199 @@ public class GetUnkownShip {
                         while(md5DataList!=null){
                             Iterator<JSONObject> it = md5DataList.iterator();     
                             while(it.hasNext()) {  
-                                if(isStopScanner()){
+                                if(isStopScanner() && taskID == blockCount - 2){
                                     msgPublish.msgPublisher("新立绘扫描线程已停止",0,0);
                                     return taskID;
                                 }
                                 JSONObject data = it.next(); 
                                 try {
-                                    if (getMDD("http://"+serveraddress+"/kcs/"+data.getString("path"),data.getLong("timestamp"))) {
+                                    if (getMDD("http://"+serveraddress+"/kcs/"+data.getString("path"),data.getLong("timestamp"),data.getString("hash"))) {
                                         it.remove();
                                         String filename=data.getString("filename");
+                                        if(!new File(rootFolder+File.separator+filename+".swf").exists()){
+                                            continue;
+                                        }
                                         if(md5DataSet.contains(Hash.getNewHash(rootFolder+File.separator+filename+".swf"))){
                                             continue;
                                         }
                                         msgPublish.msgPublisher("立绘文件： "+data.getString("id")+"\t"+"http://"+serveraddress+"/kcs/"+data.getString("path"),0,0);
                                         msgPublish.msgPublisher("立绘HASH： "+Hash.getNewHash(rootFolder+File.separator+filename+".swf"),0,0);
                                         rename.renameShipSwf(filename);
+                                    } else {
+                                        serverAddress();
                                     }
-                                } catch (InterruptedException ex) {
-                                    Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);  
                                 } catch (Exception ex) {
                                     Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             } 
                             if(md5DataList.isEmpty()){
-                                msgPublish.msgPublisher("新立绘扫描线程结束",0,0);
+                                msgPublish.msgPublisher("新立绘扫描线程:Thread-"+taskID+"结束",0,0);
                                 return taskID;
                             }
                             try{
                                 sleep(90*1000);
                             } catch (InterruptedException ex){
                                 Logger.getLogger(GetUnknowSlotitem.class.getName()).log(Level.SEVERE, null, ex);
-                                msgPublish.msgPublisher("新立绘扫描线程已强制退出。",0,0);
+                                msgPublish.msgPublisher("新立绘扫描线程:Thread-"+taskID+"已强制退出。",0,0);
                                 return taskID;
                             }
-                            if(isStopScanner()){
+                            if(isStopScanner() && taskID == blockCount - 2){
                                 msgPublish.msgPublisher("新立绘扫描线程已停止",0,0);
                                 return taskID;
                             }
-                            msgPublish.msgPublisher("开始下一轮新立绘扫描",0,0);
+                            if(taskID == blockCount - 2){
+                                msgPublish.msgPublisher("开始下一轮新立绘扫描",0,0);
+                            }
+                            
                         }
                     
                     return taskID;
                 }
-            },taskID,"GetUnkownShip-getUnknowData");
-        
-        /*
-        new Thread() {
-        @Override
-            public void run() {
-                GetUnkownShip rename=new GetUnkownShip();
-                try {
-                    while(dataList!=null){
-                        Iterator<String> it = dataList.iterator();     
-                        while(it.hasNext()) {  
-                            String data = it.next(); 
-                            if (getMDD("http://"+serveraddress+"/kcs/resources/swf/ships/"+data+".swf")) {
-                                it.remove();
-                                if(md5DataSet.equals(Hash.getNewHash(localpath+File.separator+"download"+File.separator+"newShip"+File.separator+data+".swf"))){
-                                    continue;
-                                }
-                                rename.renameShipSwf(data);
-                            }  
-                            if(isStopScanner()){
-                                return;
-                            }
-                        } 
-                        if(dataList.isEmpty()){
-                            msgPublish.msgPublisher("新立绘扫描线程结束",0,0);
-                            break;
-                        }
-                        sleep(90*1000);
-                        msgPublish.msgPublisher("开始下一轮新立绘扫描",0,0);
-                    }
-                } catch (Exception ex) {
-                    Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }  
-        }.start();  
-        */
+            },taskID,"GetUnkownShip-getUnknowData Thread-"+taskID);
     }
     
-    public synchronized boolean getMDD(String URL,Long timestamp) throws MalformedURLException, IOException, InterruptedException, Exception{
-        int i=URL.lastIndexOf("/"); //取得子串的初始位置
-        String filename=URL.substring(i+1,URL.length());
         
-        URL serverUrl = new URL(URL);
-        HttpURLConnection urlcon;
-        System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
-        System.setProperty("sun.net.client.defaultReadTimeout", "15000");
-        if(!MainServer.isDebugMode()){
-            Proxy tempproxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxyhost, proxyport));
-            //Proxy tempproxy = new Proxy(Proxy.Type.SOCKS,new InetSocketAddress(proxyhost, proxyport));
-            urlcon = (HttpURLConnection) serverUrl.openConnection(tempproxy);
-        }else{
-            urlcon = (HttpURLConnection) serverUrl.openConnection();
-        }
+    public boolean setterSplitter(){
+        unknowShipList.clear();
         
-        urlcon.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");  
-        urlcon.setRequestMethod("HEAD");
-        urlcon.setIfModifiedSince(timestamp);
-        String message = urlcon.getHeaderField(0);
-        if(message==null){
-            //msgPublish.msgPublisher("getUnknowShip模块无法获取服务器文件信息，请检查网络。",0,-1);  
-            serverAddress();
+        if(!loadKnewFile()){
             return false;
         }
-        if(message.contains("HTTP/1.1 403")){
-            urlcon.disconnect();
-            serverAddress();
-            return false;
-        }
-        if(message.contains("HTTP/1.1 404 Not Found")){
-            urlcon.disconnect();
-        }
-        if(urlcon.getLastModified()==0){
-            urlcon.disconnect();
-            serverAddress();
-            return false;
-        }
-        if(message.contains("HTTP/1.1 304 Not Modified")){
-            urlcon.disconnect();
-        }
-        if(message.contains("HTTP/1.1 200 OK")){
-            urlcon.disconnect();
-            if  (!(new File(rootFolder).exists()) || !(new File(rootFolder).isDirectory())) {
-                new File(rootFolder) .mkdirs();  
+            ArrayList<JSONObject> tempList = new ArrayList();
+            
+            int blockSize= (int) Math.ceil(md5DataList.size()/(double) blockCount);
+            int countno=0;
+            int sum=0;
+            int blockno=1;
+            for(JSONObject ship:md5DataList){
+                tempList.add(ship);
+                countno++;
+                sum++;
+                if(countno==blockSize){
+                    getUnknowData((List<JSONObject>) tempList.clone(),blockno);
+                    tempList.clear();
+                    countno=0;
+                    blockno++;
+                    continue;
+                }
+                if(sum==md5DataList.size()){
+                    getUnknowData((List<JSONObject>) tempList.clone(),blockno);
+                    tempList.clear();
+                    break;
+                }
             }
-            if(new DlCore().download(URL, rootFolder+File.separator+filename,proxyhost,proxyport)){
-                //msgPublish.msgPublisher(filename+"\t下载完成",1,0);    
-            } 
+            msgPublish.msgPublisher("开始新舰娘扫描。",0,0);
             return true;
+    }
+    
+    //synchronized
+    public boolean getMDD(String URL,Long timestamp,String HashHex) {
+        try {
+            int i=URL.lastIndexOf("/"); //取得子串的初始位置
+            String filename=URL.substring(i+1,URL.length());
+            
+            URL serverUrl = new URL(URL);
+            HttpURLConnection urlcon;
+            System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
+            System.setProperty("sun.net.client.defaultReadTimeout", "15000");
+            /*if(!MainServer.isDebugMode()){
+                Proxy tempproxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxyhost, proxyport));
+                //Proxy tempproxy = new Proxy(Proxy.Type.SOCKS,new InetSocketAddress(proxyhost, proxyport));
+                urlcon = (HttpURLConnection) serverUrl.openConnection(tempproxy);
+            }else{
+                urlcon = (HttpURLConnection) serverUrl.openConnection();
+            }*/
+            urlcon = (HttpURLConnection) serverUrl.openConnection();
+            urlcon.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");
+            urlcon.setRequestMethod("HEAD");
+            urlcon.setIfModifiedSince(timestamp);
+            urlcon.setUseCaches(false);
+            String message = urlcon.getHeaderField(0);
+            if(message==null){
+                //msgPublish.msgPublisher("getUnknowShip模块无法获取服务器文件信息，请检查网络。",0,-1);
+                serverAddress();
+                return false;
+            }
+            if(message.contains("HTTP/1.1 403")){
+                urlcon.disconnect();
+                serverAddress();
+                return false;
+            }
+            if(message.contains("HTTP/1.1 404 Not Found")){
+                urlcon.disconnect();
+                return true;
+            }
+            if(urlcon.getLastModified()==0){
+                urlcon.disconnect();
+                serverAddress();
+                return false;
+            }
+            if(message.contains("HTTP/1.1 304 Not Modified")){
+                urlcon.disconnect();
+                return true;
+            }
+            if(message.contains("HTTP/1.1 200 OK")){
+                urlcon.disconnect();
+                if(timestamp >= urlcon.getLastModified()){
+                    urlcon.disconnect();
+                    //msgPublish.msgPublisher("移除无法识别If-Modified-Since的服务器：\t"+serveraddress,0,0); 
+                    serverlistaddress.remove(serveraddress);
+                    //serverlistaddress = MainServer.getWorldList();
+                    return false;
+                }
+                if  (!(new File(rootFolder).exists()) || !(new File(rootFolder).isDirectory())) {
+                    new File(rootFolder) .mkdirs();
+                }
+                if(new DlCore().download(URL, rootFolder+File.separator+filename,proxyhost,proxyport)){
+                    /*String hashhex = getMD5Checksum(rootFolder+File.separator+filename);
+                    msgPublish.msgPublisher(filename+"\t"+urlcon.getLastModified(),0,0);
+                    msgPublish.msgPublisher(filename+"\t"+timestamp,0,0);
+                    msgPublish.msgPublisher(filename+"\t"+hashhex,0,0);
+                    if(hashhex.equals(HashHex)){
+                        return false;
+                    }*/
+                }
+                return true;
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GetUnkownShip.class.getName()).log(Level.SEVERE, null, ex);
         }
-        serverAddress();
-        return false;  
+        //serverAddress();
+        return false;
     }
     
     private static void serverAddress(){
-        serveraddress=serverlistaddress.get(servernum);
-        servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
-        servernum++;
-        if(servernum==serverlistaddress.size()){
+        if(servernum >= serverlistaddress.size()-1){
+            servernum=0;
+        }
+        if(serverlistaddress.isEmpty()){
+            serveraddress = "203.104.209.102";
+        }else{
+            serveraddress=serverlistaddress.get(servernum);
+            servername=serverlistname[servernum]+"-"+serverlistaddress.get(servernum);
+            servernum++;
+        }
+        if(servernum >= serverlistaddress.size()){
             servernum=0;
         }
     }
     
+    public static String getMD5Checksum(String filename) {
+        String md5 = "";
+        try (FileInputStream fis = new FileInputStream(filename)) {
+            md5 = DigestUtils.md5Hex(IOUtils.toByteArray(fis));
+            IOUtils.closeQuietly(fis);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
+            msgPublish.msgPublisher("getUnkownShipPool-getMD5Checksum模块读写时发生FileNotFoundException错误。",0,-1); 
+        } catch (IOException ex) {
+            Logger.getLogger(GetLastModifiedData.class.getName()).log(Level.SEVERE, null, ex);
+            msgPublish.msgPublisher("getUnkownShipPool-getMD5Checksum模块读写时发生IOException错误。",0,-1); 
+        }
+        return md5;
+    }
     
     public boolean renameShipSwf(String shipname){
         

@@ -62,21 +62,30 @@ public class UnpackSwf {
         return false;
     }
     
-    public boolean createDiffFile(String folder,String file) {
+    public int createDiffFile(String folder,String file) {
+        int count =0;
         if(isInit){
-            return false;
+            return count;
         }
-        File[] fileList = new File(file).listFiles();
-        for(File swf:fileList){
-            if(swf.isFile() && swf.getName().contains(".swf")) {
-                if(swf.getName().toLowerCase().contains("core.swf")){
-                    continue;
+        if(new File(file).isDirectory()){
+            File[] fileList = new File(file).listFiles();
+            for(File swf:fileList){
+                if(swf.isFile() && swf.getName().contains(".swf")) {
+                    if(swf.getName().toLowerCase().contains("core.swf")){
+                        continue;
+                    }
+                    count++;
+                    callShell("java -jar \""+ffdecpath+"\" -export script,image,sound \""+folder+"/"+swf.getName()+"\" \""+swf.getAbsolutePath()+"\"");
                 }
-                callShell("java -jar \""+ffdecpath+"\" -export script,image,sound \""+folder+"\" \""+file+"\"");
             }
+        } else {
+            count++;
+            File swf = new File(file);
+            callShell("java -jar \""+ffdecpath+"\" -export script,image,sound \""+folder+"/"+swf.getName()+"\" \""+swf.getAbsolutePath()+"\"");
         }
+        
         isInit = true;
-        return true;
+        return count;
     }
     
     //解压各种游戏swf和批量解压文件夹

@@ -23,7 +23,7 @@ public class Controller {
     
     
     public Controller() throws IOException{
-        this.currentfolder = MainServer.getTempFolder()+File.separator+"currentswf";
+        this.currentfolder = MainServer.getPublishFolder()+File.separator+"currentswf";
         this.previousfolder = MainServer.getPreviousFolder();
         if(!new File(currentfolder).exists()){new File(currentfolder).mkdirs();}
         ffdec=new UnpackSwf();
